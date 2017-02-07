@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard src/*.c)
-HEADERS = $(wildcard src/*.h)
+C_SOURCES = $(wildcard */*.c)
+HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
 CC = gcc
 ARCH = $(shell uname -m)
@@ -28,17 +28,18 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ)
 	  $^
 
 %.o: %.c $(C_SOURCES)
-	$(CC) -m32 -ffreestanding  -c $< -o $@
+	$(CC) -m32 -ffreestanding -I . -c $< -o $@
 
 os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
 	cat asm/boot_sect.bin asm/kernel.bin asm/empty.bin > os-image
 
 clean:
-	rm -fr asm/*.bin asm/*.o src/*.o os-image asm/kernel.bin
+	rm -fr asm/*.bin asm/*.o os-image
+	rm kernel/*.o drivers/*.o
 
 run: os-image
 ifeq ("$(ARCH)", "x86_64")
-		qemu-system-x86_64 $^
+	qemu-system-x86_64 $^
 else
-		qemu-system-i386 $^
+	qemu-system-i386 $^
 endif
