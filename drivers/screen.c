@@ -37,11 +37,51 @@ void print_at(char* string, int row, int col) {
     int i = 0;
     while(string[i] != 0) {
         print_char_at(string[i++], row, col);
+
+        if(col != -1) {
+            col++;
+        }
     }
 }
 
 void print(char* string) {
     print_at(string, -1, -1);
+}
+
+void print_int_at_attr(int i, int row, int col, char attribute_byte) {
+    char b[128];
+    char const digit[] = "0123456789";
+    char* p = b;
+
+    if(i < 0) {
+        *p++ = '-';
+        i *= -1;
+    }
+
+    int shifter = i;
+
+    do {
+        ++p;
+        shifter = shifter / 10;
+    }
+    while(shifter);
+
+    *p = '\0';
+    do {
+        *--p = digit[i % 10];
+        i = i / 10;
+    }
+    while(i);
+
+    print(b);
+}
+
+void print_int_at(int i, int row, int col) {
+    print_int_at_attr(i, row, col, WHITE_ON_BLACK);
+}
+
+void print_int(int i) {
+    print_int_at(i, -1, -1);
 }
 
 int get_screen_offset(int row, int col) {

@@ -15,6 +15,12 @@ void print_at(char* string, int row, int col);
 
 void print(char* c);
 
+void print_int_at_attr(int i, int row, int col, char attribute_byte);
+
+void print_int_at(int i, int row, int col);
+
+void print_int(int i);
+
 int get_screen_offset(int row, int col);
 
 int get_cursor();
