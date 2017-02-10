@@ -3,7 +3,7 @@ HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
 CC = gcc
 ARCH = $(shell uname -m)
-
+CCFLAGS = -std=c99 -m32 -ffreestanding -I .
 all: os-image
 
 test:
@@ -28,7 +28,7 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ)
 	  $^
 
 %.o: %.c $(C_SOURCES)
-	$(CC) -m32 -ffreestanding -I . -c $< -o $@
+	$(CC) $(CCFLAGS) -c $< -o $@
 
 os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
 	cat asm/boot_sect.bin asm/kernel.bin asm/empty.bin > os-image
