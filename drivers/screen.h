@@ -11,6 +11,8 @@ void print_char_at(char c, int row, int col);
 
 void print_char(char c);
 
+void print_at_attr(char* string, int row, int col, char attribute_byte);
+
 void print_at(char* string, int row, int col);
 
 void print(char* c);

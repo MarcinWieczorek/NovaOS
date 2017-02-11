@@ -33,15 +33,19 @@ void print_char(char c) {
     print_char_at(c, -1, -1);
 }
 
-void print_at(char* string, int row, int col) {
+void print_at_attr(char* string, int row, int col, char attribute_byte) {
     int i = 0;
     while(string[i] != 0) {
-        print_char_at(string[i++], row, col);
+        print_char_at_attr(string[i++], row, col, attribute_byte);
 
         if(col != -1) {
             col++;
         }
     }
+}
+
+void print_at(char* string, int row, int col) {
+    print_at_attr(string, row, col, WHITE_ON_BLACK);
 }
 
 void print(char* string) {
@@ -73,7 +77,7 @@ void print_int_at_attr(int i, int row, int col, char attribute_byte) {
     }
     while(i);
 
-    print(b);
+    print_at_attr(b, row, col, attribute_byte);
 }
 
 void print_int_at(int i, int row, int col) {
