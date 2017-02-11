@@ -6,16 +6,10 @@ ARCH = $(shell uname -m)
 CCFLAGS = -std=c99 -m32 -ffreestanding -I .
 all: os-image
 
-test:
-	echo $(C_SOURCES)
-	echo $(OBJ)
-	echo $(ARCH)
-
-asm/boot_sect.bin: asm/boot_sect.asm
+%.bin: %.asm
 	nasm -i asm/ $^ -f bin -o $@
-	nasm asm/empty.asm -f bin -o asm/empty.bin
 
-asm/kernel_entry.o: asm/kernel_entry.asm
+%.o: %.asm
 	nasm $^ -f elf -o $@
 
 asm/kernel.bin: asm/kernel_entry.o $(OBJ)
@@ -31,11 +25,11 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ)
 	$(CC) $(CCFLAGS) -c $< -o $@
 
 os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
-	cat asm/boot_sect.bin asm/kernel.bin asm/empty.bin > os-image
+	cat $^ > os-image
 
 clean:
 	rm -fr asm/*.bin asm/*.o os-image
-	rm kernel/*.o drivers/*.o
+	rm -fr kernel/*.o drivers/*.o
 
 run: os-image
 ifeq ("$(ARCH)", "x86_64")
