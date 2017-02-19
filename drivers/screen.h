@@ -17,6 +17,8 @@ void print_at(char* string, int row, int col);
 
 void print(char* c);
 
+void print_ln(char* c);
+
 void print_int_at_attr(int i, int row, int col, char attribute_byte);
 
 void print_int_at(int i, int row, int col);
@@ -25,11 +27,16 @@ void print_int(int i);
 
 int get_screen_offset(int row, int col);
 
-int get_cursor();
+int get_cursor(void);
 
 void set_cursor_offset(int offset);
 
 void set_cursor(int row, int col);
 
-void clear_screen();
+void clear_screen(void);
 
+void scroll_up(int lines);
+
+void scroll_down(int lines);
+
+char get_char_at(int row, int col);

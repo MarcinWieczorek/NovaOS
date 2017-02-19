@@ -1,5 +1,6 @@
 #include <drivers/screen.h>
 #include <kernel/low_level.h>
+#include <kernel/util.h>
 
 void print_char_at_attr(char c, int row, int col, char attribute_byte) {
     unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
@@ -12,6 +13,11 @@ void print_char_at_attr(char c, int row, int col, char attribute_byte) {
         int cursor = get_cursor() / 2;
         row = cursor / MAX_COLS;
         col = cursor % MAX_COLS;
+    }
+
+    if(row >= MAX_ROWS) {
+        scroll_up(1);
+        row--;
     }
 
     if(c == '\n') {
@@ -50,6 +56,11 @@ void print_at(char* string, int row, int col) {
 
 void print(char* string) {
     print_at(string, -1, -1);
+}
+
+void print_ln(char* string) {
+    print(string);
+    print("\n");
 }
 
 void print_int_at_attr(int i, int row, int col, char attribute_byte) {
@@ -120,5 +131,26 @@ void clear_screen() {
     }
 
     set_cursor(0, 0);
+}
+
+void scroll_up(int lines) {
+    while(lines > 0) {
+        for(int y = 1; y < MAX_ROWS; y++) {
+            memory_copy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
+                        (char*) get_screen_offset(y - 1, 0) + VIDEO_ADDRESS,
+                        MAX_COLS * 2);
+        }
+
+        unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
+
+        int offset = get_screen_offset(MAX_ROWS - 1, 0);
+        for(int x = 0; x < MAX_COLS; x++) {
+            vidmem[offset] = ' ';
+            vidmem[offset + 1] = WHITE_ON_BLACK;
+            offset += 2;
+        }
+
+        lines--;
+    }
 }
 
