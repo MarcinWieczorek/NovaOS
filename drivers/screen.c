@@ -134,16 +134,16 @@ void clear_screen() {
 }
 
 void scroll_up(int lines) {
+    for(int y = lines; y < MAX_ROWS; y++) {
+        memory_copy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
+                    (char*) get_screen_offset(y - lines, 0) + VIDEO_ADDRESS,
+                    MAX_COLS * 2);
+    }
+
+    unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
+
+    int offset = get_screen_offset(MAX_ROWS - lines, 0);
     while(lines > 0) {
-        for(int y = 1; y < MAX_ROWS; y++) {
-            memory_copy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
-                        (char*) get_screen_offset(y - 1, 0) + VIDEO_ADDRESS,
-                        MAX_COLS * 2);
-        }
-
-        unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
-
-        int offset = get_screen_offset(MAX_ROWS - 1, 0);
         for(int x = 0; x < MAX_COLS; x++) {
             vidmem[offset] = ' ';
             vidmem[offset + 1] = WHITE_ON_BLACK;
