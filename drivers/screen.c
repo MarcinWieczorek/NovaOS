@@ -154,3 +154,7 @@ void scroll_up(int lines) {
     }
 }
 
+char get_char_at(int row, int col) {
+    unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
+    return vidmem[get_screen_offset(row, col)];
+}
