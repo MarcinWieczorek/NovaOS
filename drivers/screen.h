@@ -25,6 +25,12 @@ void print_int_at(int i, int row, int col);
 
 void print_int(int i);
 
+void print_hex_at_attr(int i, int row, int col, char attribute_byte);
+
+void print_hex_at(int i, int row, int col);
+
+void print_hex(int i);
+
 int get_screen_offset(int row, int col);
 
 int get_cursor(void);

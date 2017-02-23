@@ -99,6 +99,36 @@ void print_int(int i) {
     print_int_at(i, -1, -1);
 }
 
+void print_hex_at_attr(int i, int row, int col, char attribute_byte) {
+    char string[] = "0x0000";
+
+    int cindex = sizeof(string) - 2;
+    while(i != 0) {
+        int remainder = i % 16;
+        i /= 16;
+        char c;
+
+        if(remainder >= 10) {
+            c = (char) (remainder + 55);
+        }
+        else {
+            c = (char) (remainder + 48);
+        }
+
+        string[cindex--] = c;
+    }
+
+    print_at_attr(string, row, col, attribute_byte);
+}
+
+void print_hex_at(int i, int row, int col) {
+    print_hex_at_attr(i, row, col, WHITE_ON_BLACK);
+}
+
+void print_hex(int i) {
+    print_hex_at(i, -1, -1);
+}
+
 int get_screen_offset(int row, int col) {
     return (row * MAX_COLS + col) * 2;
 }
