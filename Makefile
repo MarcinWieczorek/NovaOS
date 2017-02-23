@@ -33,7 +33,7 @@ clean:
 
 run: os-image
 ifeq ("$(ARCH)", "x86_64")
-	qemu-system-x86_64 $^
+	qemu-system-x86_64 -drive format=raw,file=$^
 else
-	qemu-system-i386 $^
+	qemu-system-i386 -drive format=raw,file=$^
 endif
