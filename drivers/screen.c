@@ -4,11 +4,13 @@
 #include <stdarg.h>
 #include <libc/string.h>
 
+char attribute = WHITE_ON_BLACK;
+
 void print_char_at_attr(char c, int row, int col, char attribute_byte) {
     unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
 
     if(!attribute_byte) {
-        attribute_byte = WHITE_ON_BLACK;
+        attribute_byte = attribute;
     }
 
     if(row == -1 && col == -1) {
@@ -34,7 +36,7 @@ void print_char_at_attr(char c, int row, int col, char attribute_byte) {
 }
 
 void print_char_at(char c, int row, int col) {
-    print_char_at_attr(c, row, col, WHITE_ON_BLACK);
+    print_char_at_attr(c, row, col, attribute);
 }
 
 void print_char(char c) {
@@ -53,7 +55,7 @@ void print_at_attr(char* string, int row, int col, char attribute_byte) {
 }
 
 void print_at(char* string, int row, int col) {
-    print_at_attr(string, row, col, WHITE_ON_BLACK);
+    print_at_attr(string, row, col, attribute);
 }
 
 void print(char* string) {
@@ -94,7 +96,7 @@ void print_int_at_attr(int i, int row, int col, char attribute_byte) {
 }
 
 void print_int_at(int i, int row, int col) {
-    print_int_at_attr(i, row, col, WHITE_ON_BLACK);
+    print_int_at_attr(i, row, col, attribute);
 }
 
 void print_int(int i) {
@@ -124,7 +126,7 @@ void print_hex_at_attr(int i, int row, int col, char attribute_byte) {
 }
 
 void print_hex_at(int i, int row, int col) {
-    print_hex_at_attr(i, row, col, WHITE_ON_BLACK);
+    print_hex_at_attr(i, row, col, attribute);
 }
 
 void print_hex(int i) {
@@ -231,3 +233,12 @@ char get_char_at(int row, int col) {
     unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
     return vidmem[get_screen_offset(row, col)];
 }
+
+void set_foreground_color(char color) {
+    attribute = color | (attribute & 0xF0);
+}
+
+void set_background_color(char color) {
+    attribute = (color << 4) | (attribute & 0x0F);
+}
+

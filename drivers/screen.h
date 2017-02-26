@@ -6,6 +6,24 @@
 #define  REG_SCREEN_DATA 0x3D5
 #define  printf(...) printf(__VA_ARGS__)
 
+// Colors
+#define BLACK          0x0
+#define BLUE           0x1
+#define GREEN          0x2
+#define CYAN           0x3
+#define RED            0x4
+#define MAGENTA        0x5
+#define BROWN          0x6
+#define GRAY           0x7
+#define DARK_GRAY      0x8
+#define BRIGHT_BLUE    0x9
+#define BRIGHT_GREEN   0xA
+#define BRIGHT_CYAN    0xB
+#define BRIGHT_RED     0xC
+#define BRIGHT_MAGENTA 0xD
+#define YELLOW         0xE
+#define WHITE          0xF
+
 void print_char_at_attr(char c, int row, int col, char attribute_byte);
 
 void print_char_at(char c, int row, int col);
@@ -49,3 +67,8 @@ void scroll_up(int lines);
 void scroll_down(int lines);
 
 char get_char_at(int row, int col);
+
+void set_foreground_color(char color);
+
+void set_background_color(char color);
+
