@@ -1,3 +1,5 @@
+#include <kernel/low_level.h>
+
 unsigned char in_b(unsigned short port) {
     unsigned char result;
     __asm__("IN %%DX, %%AL" : "=a" (result) : "d" (port));

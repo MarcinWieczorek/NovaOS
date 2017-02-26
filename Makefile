@@ -1,9 +1,10 @@
-C_SOURCES = $(wildcard */*.c)
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+C_SOURCES = $(call rwildcard,*,*.c)
 HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
-CC = gcc
+CC = $(HOME)/opt/cross/bin/i686-elf-gcc
 ARCH = $(shell uname -m)
-CCFLAGS = -std=c99 -m32 -ffreestanding -I .
+CCFLAGS = -std=c99 -m32 -ffreestanding -I.
 all: os-image
 
 %.bin: %.asm

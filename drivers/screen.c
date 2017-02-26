@@ -1,6 +1,8 @@
 #include <drivers/screen.h>
 #include <kernel/low_level.h>
 #include <kernel/util.h>
+#include <stdarg.h>
+#include <libc/string.h>
 
 void print_char_at_attr(char c, int row, int col, char attribute_byte) {
     unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
@@ -127,6 +129,47 @@ void print_hex_at(int i, int row, int col) {
 
 void print_hex(int i) {
     print_hex_at(i, -1, -1);
+}
+
+void printf(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    int stop = (int) format + strlen(format);
+
+    while(format < stop) {
+        char c = *(format);
+
+        if(c == '%') {
+            format++;
+            char specifier = *format;
+
+            switch(specifier) {
+                case 's':
+                    print(va_arg(args, char*));
+                    break;
+                case '%':
+                    print_char('%');
+                    break;
+                case 'x':
+                case 'X':
+                    print_hex(va_arg(args, unsigned int));
+                    break;
+                case 'u':
+                    print_int(va_arg(args, unsigned int));
+                    break;
+                case 'd':
+                case 'i':
+                    print_int(va_arg(args, signed int));
+                    break;
+            }
+
+            format++;
+            continue;
+        }
+
+        format++;
+        print_char(c);
+    }
 }
 
 int get_screen_offset(int row, int col) {
