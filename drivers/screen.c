@@ -2,7 +2,7 @@
 #include <kernel/low_level.h>
 #include <kernel/util.h>
 #include <stdarg.h>
-#include <libc/string.h>
+#include <string.h>
 
 char attribute = WHITE_ON_BLACK;
 

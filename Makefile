@@ -4,7 +4,7 @@ HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
 CC = $(HOME)/opt/cross/bin/i686-elf-gcc
 ARCH = $(shell uname -m)
-CCFLAGS = -std=c99 -m32 -ffreestanding -I.
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc
 all: os-image
 
 %.bin: %.asm
