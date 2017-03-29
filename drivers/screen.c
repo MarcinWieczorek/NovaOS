@@ -1,6 +1,5 @@
 #include <drivers/screen.h>
 #include <kernel/low_level.h>
-#include <kernel/util.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -210,7 +209,7 @@ void clear_screen() {
 
 void scroll_up(int lines) {
     for(int y = lines; y < MAX_ROWS; y++) {
-        memory_copy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
+        memcpy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
                     (char*) get_screen_offset(y - lines, 0) + VIDEO_ADDRESS,
                     MAX_COLS * 2);
     }

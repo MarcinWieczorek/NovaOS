@@ -4,7 +4,7 @@ HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
 CC = $(HOME)/opt/cross/bin/i686-elf-gcc
 ARCH = $(shell uname -m)
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include
 all: os-image
 
 %.bin: %.asm
@@ -22,7 +22,7 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ)
 	  --oformat binary \
 	  $^
 
-%.o: %.c $(C_SOURCES)
+%.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h
 	$(CC) $(CCFLAGS) -c $< -o $@
 
 os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
@@ -31,6 +31,7 @@ os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
 clean:
 	rm -fr asm/*.bin asm/*.o os-image
 	rm -fr kernel/*.o drivers/*.o
+	rm -fr libc/include/bits/alltypes.h
 
 run: os-image
 ifeq ("$(ARCH)", "x86_64")
@@ -38,3 +39,8 @@ ifeq ("$(ARCH)", "x86_64")
 else
 	qemu-system-i386 -drive format=raw,file=$^
 endif
+
+libc/include/bits/alltypes.h: libc/arch/$(ARCH)/bits/alltypes.h.in libc/include/alltypes.h.in tools/mkalltypes.sed
+	mkdir -p libc/include/bits/
+	sed -f tools/mkalltypes.sed libc/arch/$(ARCH)/bits/alltypes.h.in libc/include/alltypes.h.in > $@
+
