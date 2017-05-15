@@ -132,47 +132,6 @@ void print_hex(int i) {
     print_hex_at(i, -1, -1);
 }
 
-void printf(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    int stop = (int) format + strlen(format);
-
-    while(format < stop) {
-        char c = *(format);
-
-        if(c == '%') {
-            format++;
-            char specifier = *format;
-
-            switch(specifier) {
-                case 's':
-                    print(va_arg(args, char*));
-                    break;
-                case '%':
-                    print_char('%');
-                    break;
-                case 'x':
-                case 'X':
-                    print_hex(va_arg(args, unsigned int));
-                    break;
-                case 'u':
-                    print_int(va_arg(args, unsigned int));
-                    break;
-                case 'd':
-                case 'i':
-                    print_int(va_arg(args, signed int));
-                    break;
-            }
-
-            format++;
-            continue;
-        }
-
-        format++;
-        print_char(c);
-    }
-}
-
 int get_screen_offset(int row, int col) {
     return (row * MAX_COLS + col) * 2;
 }
