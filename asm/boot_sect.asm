@@ -22,7 +22,7 @@ load_kernel:
     CALL println            ; MSG_LOAD_KERNEL
 
     MOV BX, KERNEL_OFFSET   ; Load from the disk
-    MOV DH, 15
+    MOV DH, 45
     MOV DL, [BOOT_DRIVE]
     CALL disk_load
     RET
