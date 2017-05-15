@@ -34,6 +34,15 @@ void print_char_at_attr(char c, int row, int col, char attribute_byte) {
         return;
     }
 
+    if(c == '\b') {
+        if(col >= 1 || row >= 1) {
+            print_char_at(' ', row, col - 1);
+            set_cursor(row, col - 1);
+        }
+
+        return;
+    }
+
     int offset = get_screen_offset(row, col);
     vidmem[offset] = c;
     vidmem[offset + 1] = attribute_byte;

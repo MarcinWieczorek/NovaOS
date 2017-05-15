@@ -5,3 +5,4 @@ void main() {
     clear_screen();
     idt_install();
 }
+
