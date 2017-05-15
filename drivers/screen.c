@@ -12,10 +12,16 @@ void print_char_at_attr(char c, int row, int col, char attribute_byte) {
         attribute_byte = attribute;
     }
 
-    if(row == -1 && col == -1) {
+    if(row == -1 || col == -1) {
         int cursor = get_cursor() / 2;
-        row = cursor / MAX_COLS;
-        col = cursor % MAX_COLS;
+
+        if(row == -1) {
+            row = cursor / MAX_COLS;
+        }
+
+        if(col == -1) {
+            col = cursor % MAX_COLS;
+        }
     }
 
     if(row >= MAX_ROWS) {
@@ -66,7 +72,7 @@ void print_ln(char* string) {
     print("\n");
 }
 
-void print_int_at_attr(int i, int row, int col, char attribute_byte) {
+void print_int_at_attr(size_t i, int row, int col, char attribute_byte) {
     char b[128];
     char const digit[] = "0123456789";
     char* p = b;
@@ -76,7 +82,7 @@ void print_int_at_attr(int i, int row, int col, char attribute_byte) {
         i *= -1;
     }
 
-    int shifter = i;
+    size_t shifter = i;
 
     do {
         ++p;
@@ -94,15 +100,16 @@ void print_int_at_attr(int i, int row, int col, char attribute_byte) {
     print_at_attr(b, row, col, attribute_byte);
 }
 
-void print_int_at(int i, int row, int col) {
+void print_int_at(size_t i, int row, int col) {
     print_int_at_attr(i, row, col, attribute);
 }
 
-void print_int(int i) {
+void print_int(size_t i) {
     print_int_at(i, -1, -1);
 }
 
-void print_hex_at_attr(int i, int row, int col, char attribute_byte) {
+void print_hex_at_attr(int i, int row, int col, char attribute_byte,
+                       char uppercase) {
     char string[] = "0x0000";
 
     int cindex = sizeof(string) - 2;
@@ -124,12 +131,12 @@ void print_hex_at_attr(int i, int row, int col, char attribute_byte) {
     print_at_attr(string, row, col, attribute_byte);
 }
 
-void print_hex_at(int i, int row, int col) {
-    print_hex_at_attr(i, row, col, attribute);
+void print_hex_at(int i, int row, int col, char uppercase) {
+    print_hex_at_attr(i, row, col, attribute, uppercase);
 }
 
-void print_hex(int i) {
-    print_hex_at(i, -1, -1);
+void print_hex(int i, char uppercase) {
+    print_hex_at(i, -1, -1, uppercase);
 }
 
 int get_screen_offset(int row, int col) {

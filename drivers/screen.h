@@ -1,3 +1,8 @@
+#ifndef _H_DRIVERS_SCREEN
+#define _H_DRIVERS_SCREEN
+
+#include <stdio.h>
+
 #define  VIDEO_ADDRESS 0xB8000
 #define  MAX_ROWS  25
 #define  MAX_COLS  80
@@ -37,17 +42,18 @@ void print(char* c);
 
 void print_ln(char* c);
 
-void print_int_at_attr(int i, int row, int col, char attribute_byte);
+void print_int_at_attr(size_t i, int row, int col, char attribute_byte);
 
-void print_int_at(int i, int row, int col);
+void print_int_at(size_t i, int row, int col);
 
-void print_int(int i);
+void print_int(size_t i);
 
-void print_hex_at_attr(int i, int row, int col, char attribute_byte);
+void print_hex_at_attr(int i, int row, int col, char attribute_byte,
+                       char uppercase);
 
-void print_hex_at(int i, int row, int col);
+void print_hex_at(int i, int row, int col, char uppercase);
 
-void print_hex(int i);
+void print_hex(int i, char uppercase);
 
 int get_screen_offset(int row, int col);
 
@@ -69,3 +75,4 @@ void set_foreground_color(char color);
 
 void set_background_color(char color);
 
+#endif
