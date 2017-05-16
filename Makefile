@@ -6,7 +6,7 @@ CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
 # ARCH = $(shell uname -m)
 ARCH = i386
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/
 all: os-image
 
 %.bin: %.asm

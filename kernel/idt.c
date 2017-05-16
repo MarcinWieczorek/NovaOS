@@ -2,6 +2,7 @@
 #include <kernel/pic.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/io.h>
 
 unsigned char* exception_messages[] = {
         "Division by 0",

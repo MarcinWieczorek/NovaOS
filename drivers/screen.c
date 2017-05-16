@@ -1,7 +1,7 @@
 #include <drivers/screen.h>
-#include <kernel/low_level.h>
 #include <stdarg.h>
 #include <string.h>
+#include <sys/io.h>
 
 char attribute = WHITE_ON_BLACK;
 
@@ -153,19 +153,19 @@ int get_screen_offset(int row, int col) {
 }
 
 int get_cursor() {
-    out_b(REG_SCREEN_CTRL, 0x0E);
-    int offset = in_b(REG_SCREEN_DATA) << 8;
-    out_b(REG_SCREEN_CTRL, 0x0F);
-    offset += in_b(REG_SCREEN_DATA);
+    outb(0x0E, REG_SCREEN_CTRL);
+    int offset = inb(REG_SCREEN_DATA) << 8;
+    outb(0x0F, REG_SCREEN_CTRL);
+    offset += inb(REG_SCREEN_DATA);
     return offset * 2;
 }
 
 void set_cursor_offset(int offset) {
     offset /= 2;
-    out_b(REG_SCREEN_CTRL, 0x0E);
-    out_b(REG_SCREEN_DATA, offset >> 8);
-    out_b(REG_SCREEN_CTRL, 0x0F);
-    out_b(REG_SCREEN_DATA, offset);
+    outb(0x0E, REG_SCREEN_CTRL);
+    outb(offset >> 8, REG_SCREEN_DATA);
+    outb(0x0F, REG_SCREEN_CTRL);
+    outb(offset, REG_SCREEN_DATA);
 }
 
 void set_cursor(int row, int col) {
