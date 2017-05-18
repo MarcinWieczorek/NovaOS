@@ -54,6 +54,17 @@ extern void handle_isr33(void);
 extern void handle_isr34(void);
 extern void handle_isr35(void);
 extern void handle_isr36(void);
+extern void handle_isr37(void);
+extern void handle_isr38(void);
+extern void handle_isr39(void);
+extern void handle_isr40(void);
+extern void handle_isr41(void);
+extern void handle_isr42(void);
+extern void handle_isr43(void);
+extern void handle_isr44(void);
+extern void handle_isr45(void);
+extern void handle_isr46(void);
+extern void handle_isr47(void);
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
 

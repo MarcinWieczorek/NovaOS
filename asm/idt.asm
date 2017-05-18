@@ -30,6 +30,17 @@
 [GLOBAL handle_isr34]
 [GLOBAL handle_isr35]
 [GLOBAL handle_isr36]
+[GLOBAL handle_isr37]
+[GLOBAL handle_isr38]
+[GLOBAL handle_isr39]
+[GLOBAL handle_isr40]
+[GLOBAL handle_isr41]
+[GLOBAL handle_isr42]
+[GLOBAL handle_isr43]
+[GLOBAL handle_isr44]
+[GLOBAL handle_isr45]
+[GLOBAL handle_isr46]
+[GLOBAL handle_isr47]       ; IRQ15
 
 idt_load:                   ; Init IDT
     LIDT [idtp]
@@ -158,6 +169,50 @@ handle_isr36:
     CLI
     PUSH BYTE 0
     PUSH BYTE 36
+handle_isr37:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 37
+handle_isr38:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 38
+handle_isr39:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 39
+handle_isr40:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 40
+handle_isr41:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 41
+handle_isr42:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 42
+handle_isr43:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 43
+handle_isr44:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 44
+handle_isr45:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 45
+handle_isr46:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 46
+handle_isr47:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 47
 handle_isr_common:          ; Common handler caller
     PUSHA
     PUSH DS

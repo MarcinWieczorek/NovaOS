@@ -111,6 +111,17 @@ void idt_install() {
     idt_set_gate(34, (unsigned) handle_isr34, 0x08, 0x8E);
     idt_set_gate(35, (unsigned) handle_isr35, 0x08, 0x8E);
     idt_set_gate(36, (unsigned) handle_isr36, 0x08, 0x8E);
+    idt_set_gate(37, (unsigned) handle_isr37, 0x08, 0x8E);
+    idt_set_gate(38, (unsigned) handle_isr38, 0x08, 0x8E);
+    idt_set_gate(39, (unsigned) handle_isr39, 0x08, 0x8E);
+    idt_set_gate(40, (unsigned) handle_isr40, 0x08, 0x8E);
+    idt_set_gate(41, (unsigned) handle_isr41, 0x08, 0x8E);
+    idt_set_gate(42, (unsigned) handle_isr42, 0x08, 0x8E);
+    idt_set_gate(43, (unsigned) handle_isr43, 0x08, 0x8E);
+    idt_set_gate(44, (unsigned) handle_isr44, 0x08, 0x8E);
+    idt_set_gate(45, (unsigned) handle_isr45, 0x08, 0x8E);
+    idt_set_gate(46, (unsigned) handle_isr46, 0x08, 0x8E);
+    idt_set_gate(47, (unsigned) handle_isr47, 0x08, 0x8E);
 
     idt_load();
     printf("IDT initialized\n");
