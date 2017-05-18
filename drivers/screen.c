@@ -172,6 +172,13 @@ void set_cursor(int row, int col) {
     set_cursor_offset(get_screen_offset(row, col));
 }
 
+void shift_cursor(int row, int col) {
+    int cursor = get_cursor() / 2;
+    row += cursor / MAX_COLS;
+    col += cursor % MAX_COLS;
+    set_cursor(row, col);
+}
+
 void clear_screen() {
     for(int r = 0; r < MAX_ROWS; r = r+1) {
         for(int c = 0; c < MAX_COLS; c = c+1) {

@@ -63,6 +63,8 @@ void set_cursor_offset(int offset);
 
 void set_cursor(int row, int col);
 
+void shift_cursor(int row, int col);
+
 void clear_screen(void);
 
 void scroll_up(int lines);
