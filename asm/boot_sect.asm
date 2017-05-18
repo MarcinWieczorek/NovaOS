@@ -8,8 +8,6 @@ CALL println                ; Print the message
 CALL load_kernel            ; Load the kernel
 CALL switch_to_pm           ; Switch to Protected Mode
 
-JMP $
-
 %include "print.asm"        ; Includes
 %include "disk.asm"
 %include "gdt.asm"          ; Global Descriptor Table
