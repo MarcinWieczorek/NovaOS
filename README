@@ -1,0 +1,8 @@
+NovaOS
+======
+
+Build:
+`make`
+
+Run:
+`make run`
