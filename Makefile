@@ -4,6 +4,8 @@ HEADERS = $(wildcard */*.h)
 OBJ := $(C_SOURCES:.c=.o)
 CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
+# QEMU=qemu-system-x86_64
+QEMU = $(shell find /usr/bin -name "qemu-system-*")
 # ARCH = $(shell uname -m)
 ARCH = i386
 CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/
@@ -46,11 +48,7 @@ tags:
 	ctags -R
 
 run: os-image
-ifeq ("$(ARCH)", "x86_64")
-	qemu-system-i386 -drive format=raw,file=$^
-else
-	qemu-system-x86_64 -drive format=raw,file=$^
-endif
+	$(QEMU) -drive format=raw,file=$^
 
 libc/include/bits/alltypes.h: libc/arch/$(ARCH)/bits/alltypes.h.in libc/include/alltypes.h.in tools/mkalltypes.sed
 	mkdir -p libc/include/bits/
