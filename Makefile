@@ -24,7 +24,7 @@ asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ)
 	  -m elf_i386 \
 	  --entry=main \
 	  -Ttext=0x1000 \
-	  -Tdata=0x5000 \
+	  -Tdata=0x6000 \
 	  --oformat binary \
 	  $^ \
 	  libgcc.a

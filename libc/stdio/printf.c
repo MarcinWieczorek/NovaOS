@@ -26,7 +26,7 @@ int printf(const char *format, ...) {
                     break;
                 case 'x':
                 case 'X':
-                    print_hex(va_arg(args, unsigned int), c=='X');
+                    print_hex(va_arg(args, unsigned int), c=='X', 64);
                     break;
                 case 'u':
                     print_int(va_arg(args, unsigned int));
@@ -34,6 +34,9 @@ int printf(const char *format, ...) {
                 case 'd':
                 case 'i':
                     print_int(va_arg(args, signed int));
+                    break;
+                case 'f':
+                    print_double(va_arg(args, double));
                     break;
             }
 

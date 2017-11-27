@@ -81,7 +81,7 @@ void print_ln(char* string) {
     print("\n");
 }
 
-void print_int_at_attr(size_t i, int row, int col, char attribute_byte) {
+void print_int_at_attr(int i, int row, int col, char attribute_byte) {
     char b[128];
     char const digit[] = "0123456789";
     char* p = b;
@@ -109,18 +109,32 @@ void print_int_at_attr(size_t i, int row, int col, char attribute_byte) {
     print_at_attr(b, row, col, attribute_byte);
 }
 
-void print_int_at(size_t i, int row, int col) {
+void print_int_at(int i, int row, int col) {
     print_int_at_attr(i, row, col, attribute);
 }
 
-void print_int(size_t i) {
+void print_int(int i) {
     print_int_at(i, -1, -1);
 }
 
-void print_hex_at_attr(int i, int row, int col, char attribute_byte,
-                       char uppercase) {
-    char string[] = "0x0000";
+void print_double_at_attr(double d, int row, int col, char attribute_byte) {
+    print_int_at_attr((int)d, row, col, attribute_byte);
+    print_char_at_attr('.', row, col, attribute_byte);
+    unsigned int fr = (d - (unsigned int)d) * 1000000;
+    print_int_at_attr(abs(fr), -1, -1, attribute_byte);
+}
 
+void print_double_at(double d, int row, int col) {
+    print_double_at_attr(d, row, col, attribute);
+}
+
+void print_double(double d) {
+    print_double_at(d, -1, -1);
+}
+
+void print_hex_at_attr(size_t i, int row, int col, char attribute_byte,
+                       char uppercase, int width) {
+    char string[] = "0x00000000";
     int cindex = sizeof(string) - 2;
     while(i != 0) {
         int remainder = i % 16;
@@ -137,15 +151,20 @@ void print_hex_at_attr(int i, int row, int col, char attribute_byte,
         string[cindex--] = c;
     }
 
-    print_at_attr(string, row, col, attribute_byte);
+    char *str_start = &string[0];
+    if(width < 8 && width != 0) {
+        str_start = string + 10 - width;
+    }
+
+    print_at_attr(str_start, row, col, attribute_byte);
 }
 
-void print_hex_at(int i, int row, int col, char uppercase) {
-    print_hex_at_attr(i, row, col, attribute, uppercase);
+void print_hex_at(size_t i, int row, int col, char uppercase, int width) {
+    print_hex_at_attr(i, row, col, attribute, uppercase, width);
 }
 
-void print_hex(int i, char uppercase) {
-    print_hex_at(i, -1, -1, uppercase);
+void print_hex(size_t i, char uppercase, int width) {
+    print_hex_at(i, -1, -1, uppercase, width);
 }
 
 int get_screen_offset(int row, int col) {
