@@ -7,7 +7,7 @@ char *strncpy(char *dest, const char *src, size_t n) {
         dest[i] = src[i];
     }
 
-    for( ; i < n; i++) {
+    for(; i < n; i++) {
         dest[i] = '\0';
     }
 

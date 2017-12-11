@@ -1,6 +1,7 @@
-#include <drivers/screen.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
+#include <drivers/screen.h>
 #include <sys/io.h>
 
 char attribute = WHITE_ON_BLACK;

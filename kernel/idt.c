@@ -40,7 +40,7 @@ unsigned char* exception_messages[] = {
 };
 
 void handle_isr(struct isr_regs *r) {
-    if(r->int_no <= 32) {
+    if(r->int_no < 32) {
         printf("\n*****************************************************\n");
         printf("Exception #%u\n%s\n", r->int_no, exception_messages[r->int_no]);
 
