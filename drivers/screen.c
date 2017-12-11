@@ -211,9 +211,8 @@ void clear_screen() {
 
 void scroll_up(int lines) {
     for(int y = lines; y < MAX_ROWS; y++) {
-        memcpy((char*) get_screen_offset(y, 0) + VIDEO_ADDRESS,
-                    (char*) get_screen_offset(y - lines, 0) + VIDEO_ADDRESS,
-                    MAX_COLS * 2);
+        memcpy((char*) get_screen_offset(y - lines, 0) + VIDEO_ADDRESS,
+               (char*) get_screen_offset(y, 0) + VIDEO_ADDRESS, MAX_COLS * 2);
     }
 
     unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;

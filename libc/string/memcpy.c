@@ -1,6 +1,6 @@
 #include <string.h>
 
-void *memcpy (void *src, const void *dst, size_t no_bytes) {
+void *memcpy(void *dst, const void *src, size_t no_bytes) {
     char *dest = (void*) dst;
     char *source = src;
 
