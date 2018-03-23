@@ -8,7 +8,7 @@ CC = $(CROSS)bin/i686-elf-gcc
 QEMU = $(shell find /usr/bin -name "qemu-system-*")
 # ARCH = $(shell uname -m)
 ARCH = i386
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables
 all: os-image
 
 %.bin: %.asm
@@ -33,7 +33,7 @@ asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ)
 	  libgcc.a
 	@echo "LD kernel.bin"
 
-%.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h
+%.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h libc/include/bits/syscall.h
 	@$(CC) $(CCFLAGS) -c $< -o $@
 	@echo "CC $<"
 
@@ -44,7 +44,7 @@ debug:
 	gdb --eval-command="target remote :1234"
 
 clean:
-	rm -fr asm/*.bin asm/*.o os-image kernel/*.o drivers/*.o libc/include/bits/alltypes.h libgcc.a
+	rm -fr asm/*.bin asm/*.o os-image kernel/*.o drivers/*.o libc/include/bits/*.h libgcc.a
 
 tags:
 	ctags -R
@@ -52,7 +52,13 @@ tags:
 run: os-image
 	$(QEMU) -drive format=raw,file=$^
 
+libc/include/bits/syscall.h: libc/arch/$(ARCH)/bits/syscall.h.in
+	@cp $< $@
+	@sed -ine 's|__NR_|SYS_|p' $@
+	@echo "SED $<"
+
 libc/include/bits/alltypes.h: libc/arch/$(ARCH)/bits/alltypes.h.in libc/include/alltypes.h.in tools/mkalltypes.sed
 	@mkdir -p libc/include/bits/
 	@sed -f tools/mkalltypes.sed libc/arch/$(ARCH)/bits/alltypes.h.in libc/include/alltypes.h.in > $@
+	@echo "SED $<"
 

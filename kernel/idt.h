@@ -19,7 +19,7 @@ struct isr_regs {
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  /* pushed by 'pusha' */
     unsigned int int_no, err_code;    /* our 'push byte #' and ecodes do this */
     unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */
-};
+} __attribute__((packed));
 
 struct idt_entry idt[256];
 struct idt_ptr idtp;
@@ -65,6 +65,7 @@ extern void handle_isr44(void);
 extern void handle_isr45(void);
 extern void handle_isr46(void);
 extern void handle_isr47(void);
+extern void handle_isr128(void);
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
 

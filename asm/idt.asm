@@ -41,6 +41,7 @@
 [GLOBAL handle_isr45]
 [GLOBAL handle_isr46]
 [GLOBAL handle_isr47]       ; IRQ15
+[GLOBAL handle_isr128]      ; 0x80 syscall
 
 idt_load:                   ; Init IDT
     LIDT [idtp]
@@ -213,6 +214,12 @@ handle_isr47:
     CLI
     PUSH BYTE 0
     PUSH BYTE 47
+handle_isr128:
+    CLI
+    PUSH BYTE 0
+    PUSH BYTE 0
+    MOV BYTE [ESP], 0x80
+    JMP handle_isr_common
 handle_isr_common:          ; Common handler caller
     PUSHA
     PUSH DS

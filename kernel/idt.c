@@ -60,10 +60,13 @@ CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n\
             r->eax, r->ebx, r->ecx, r->edx,
             r->cs, r->eflags, r->useresp, r->ss);
     }
+    else if(r->int_no == 0x80) {
+    }
     else {
         printf("IRQ #%u\n", r->int_no);
-        PIC_sendEOI(r->int_no);
     }
+
+    PIC_sendEOI(r->int_no);
 }
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
@@ -122,6 +125,7 @@ void idt_install() {
     idt_set_gate(45, (unsigned) handle_isr45, 0x08, 0x8E);
     idt_set_gate(46, (unsigned) handle_isr46, 0x08, 0x8E);
     idt_set_gate(47, (unsigned) handle_isr47, 0x08, 0x8E);
+    idt_set_gate(0x80, (unsigned) handle_isr128, 0x08, 0x8E);
 
     idt_load();
     printf("IDT initialized\n");
