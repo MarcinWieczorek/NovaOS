@@ -1,6 +1,6 @@
 #include <math.h>
 
-float sqrtl(float n) {
+float sqrtf(float n) {
     float g = 2.0 / n;
 
     for(int i = 0; i < 5; i++) {
