@@ -3,4 +3,8 @@
 os-image
 tags
 libgcc.a
+*.dump
+os-image
+libc/include/bits/syscall.h
+libc/include/bits/alltypes.h
 

@@ -1,6 +1,8 @@
 #ifndef _H_KERNEL_IDT
 #define _H_KERNEL_IDT
 
+#include <stdlib.h>
+
 struct idt_entry {
     unsigned short base_lo;
     unsigned short sel;

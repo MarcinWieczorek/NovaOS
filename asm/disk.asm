@@ -16,5 +16,5 @@ disk_load:
 disk_error:
     MOV BX, MSG_DISK_ERROR  ; Print error message
     CALL println
-    JMP $                   ; Hang.
+    RET
 

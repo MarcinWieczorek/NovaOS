@@ -8,7 +8,7 @@ CC = $(CROSS)bin/i686-elf-gcc
 QEMU = $(shell find /usr/bin -name "qemu-system-*")
 # ARCH = $(shell uname -m)
 ARCH = i386
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto
 all: os-image
 
 %.bin: %.asm
@@ -24,6 +24,7 @@ asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ)
 	@echo "LN libgcc.a"
 
 	@ld -o $@ \
+	  -zmuldefs \
 	  -m elf_i386 \
 	  --entry=main \
 	  -Ttext=0x1000 \

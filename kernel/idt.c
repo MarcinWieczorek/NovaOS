@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/io.h>
+#include <kernel/syscall/syscall.h>
 
 unsigned char* exception_messages[] = {
         "Division by 0",
@@ -59,8 +60,16 @@ CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n\
             r->edi, r->esi, r->ebp, r->esp,
             r->eax, r->ebx, r->ecx, r->edx,
             r->cs, r->eflags, r->useresp, r->ss);
+        while(1);
     }
     else if(r->int_no == 0x80) {
+        char *vars = ((char*) r) + sizeof(struct isr_regs) + 4;
+
+        if(syscall_no == 4) {
+               do_write(*(int*)(vars),
+                   (const void*)*(int*)(vars + sizeof(int)),
+                   *(size_t*)(vars + sizeof(int) + sizeof(const char*)));
+        }
     }
     else {
         printf("IRQ #%u\n", r->int_no);
