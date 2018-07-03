@@ -42,25 +42,6 @@ void print(char* c);
 
 void print_ln(char* c);
 
-void print_int_at_attr(int i, int row, int col, char attribute_byte);
-
-void print_int_at(int i, int row, int col);
-
-void print_int(int i);
-
-void print_double_at_attr(double d, int row, int col, char attribute_byte);
-
-void print_double_at(double d, int row, int col);
-
-void print_double(double d);
-
-void print_hex_at_attr(size_t i, int row, int col, char attribute_byte,
-                       char uppercase, int width);
-
-void print_hex_at(size_t i, int row, int col, char uppercase, int width);
-
-void print_hex(size_t i, char uppercase, int width);
-
 int get_screen_offset(int row, int col);
 
 int get_cursor(void);

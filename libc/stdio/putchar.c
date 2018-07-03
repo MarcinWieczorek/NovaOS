@@ -2,5 +2,5 @@
 #include <unistd.h>
 
 int putchar(int c) {
-    write(0, &c, 1);
+    return write(0, &c, 1);
 }
