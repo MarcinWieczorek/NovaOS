@@ -7,4 +7,8 @@ libgcc.a
 os-image
 libc/include/bits/syscall.h
 libc/include/bits/alltypes.h
+*.img
+*.sym
+*.elf
+*.diff
 

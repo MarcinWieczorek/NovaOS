@@ -1,14 +1,14 @@
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 C_SOURCES = $(call rwildcard,*,*.c)
-HEADERS = $(wildcard */*.h)
+ASM_SOURCES = $(call rwildcard,libc/*,*.asm)
 OBJ := $(C_SOURCES:.c=.o)
+ASM_OBJ := $(ASM_SOURCES:.asm=.o)
 CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
-# QEMU=qemu-system-x86_64
-QEMU = $(shell find /usr/bin -name "qemu-system-*")
 # ARCH = $(shell uname -m)
 ARCH = i386
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto
+QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto -ggdb
 all: os-image
 
 %.bin: %.asm
@@ -16,33 +16,38 @@ all: os-image
 	@echo "AS $<"
 
 %.o: %.asm
-	@nasm $^ -f elf -o $@
+	@nasm $^ -f elf -F dwarf -g -o $@
 	@echo "AS $<"
 
-asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ)
+asm/kernel.bin: asm/kernel_entry.o asm/idt.o asm/tss.o asm/usermode.o $(OBJ) $(ASM_OBJ)
 	@ln -fs $(shell $(CC) -print-file-name=libgcc.a)
 	@echo "LN libgcc.a"
 
-	@ld -o $@ \
+	@ld -o kernel.elf \
 	  -zmuldefs \
 	  -m elf_i386 \
 	  --entry=main \
 	  -Ttext=0x1000 \
-	  -Tdata=0x6100 \
-	  --oformat binary \
 	  $^ \
 	  libgcc.a
-	@echo "LD kernel.bin"
+	@echo "LD kernel.elf"
+
+	objcopy --only-keep-debug kernel.elf kernel.sym
+	objcopy -O binary kernel.elf asm/kernel.bin
+	@echo "OC kernel.bin"
 
 %.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h libc/include/bits/syscall.h
 	@$(CC) $(CCFLAGS) -c $< -o $@
 	@echo "CC $<"
 
-os-image: asm/boot_sect.bin asm/kernel.bin asm/empty.bin
+os-image: asm/boot_sect.bin asm/kernel.bin
 	@cat $^ > os-image
 
 debug:
-	gdb --eval-command="target remote :1234"
+	gdb \
+		-ex="target remote :1234" \
+		-ex="symbol-file kernel.elf" \
+		-ex="set disassembly-flavor intel"
 
 clean:
 	rm -fr asm/*.bin asm/*.o os-image kernel/*.o drivers/*.o libc/include/bits/*.h libgcc.a
