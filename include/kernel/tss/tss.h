@@ -63,4 +63,6 @@ void tss_install();
 
 extern void tss_flush();
 
+extern void tss_jump(void *);
+
 #endif

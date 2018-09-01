@@ -52,7 +52,9 @@ debug:
 		-ex="set disassembly-flavor intel"
 
 clean:
-	rm -fr asm/*.bin asm/*.o os-image kernel/*.o drivers/*.o libc/include/bits/*.h libgcc.a
+	@for f in `find . -name "*.bin" -o -name "*.o" -o -name "os-image" -o -wholename "libc/include/bits/*.h" -o -name "libgcc.a"`; do \
+		rm $$f; \
+	done
 
 tags:
 	ctags -R
