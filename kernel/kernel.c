@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include <kernel/idt.h>
-#include <kernel/tss.h>
+#include <kernel/tss/tss.h>
 
 #include <drivers/screen.h>
 
