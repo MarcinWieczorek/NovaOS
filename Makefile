@@ -1,14 +1,16 @@
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 C_SOURCES = $(call rwildcard,*,*.c)
 ASM_SOURCES = $(call rwildcard,libc/*,*.asm)
+ASM_KERNEL_SOURCES = $(call rwildcard,kernel/*,*.asm)
 OBJ := $(C_SOURCES:.c=.o)
 ASM_OBJ := $(ASM_SOURCES:.asm=.o)
+ASM_OBJ += $(ASM_KERNEL_SOURCES:.asm=.o)
 CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
 # ARCH = $(shell uname -m)
 ARCH = i386
 QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto -ggdb
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Iinclude  -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto -ggdb
 all: os-image
 
 %.bin: %.asm
@@ -19,7 +21,7 @@ all: os-image
 	@nasm $^ -f elf -F dwarf -g -o $@
 	@echo "AS $<"
 
-asm/kernel.bin: asm/kernel_entry.o asm/idt.o asm/tss.o asm/usermode.o $(OBJ) $(ASM_OBJ)
+asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ) $(ASM_OBJ)
 	@ln -fs $(shell $(CC) -print-file-name=libgcc.a)
 	@echo "LN libgcc.a"
 
@@ -32,8 +34,8 @@ asm/kernel.bin: asm/kernel_entry.o asm/idt.o asm/tss.o asm/usermode.o $(OBJ) $(A
 	  libgcc.a
 	@echo "LD kernel.elf"
 
-	objcopy --only-keep-debug kernel.elf kernel.sym
-	objcopy -O binary kernel.elf asm/kernel.bin
+	@objcopy --only-keep-debug kernel.elf kernel.sym
+	@objcopy -O binary kernel.elf asm/kernel.bin
 	@echo "OC kernel.bin"
 
 %.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h libc/include/bits/syscall.h

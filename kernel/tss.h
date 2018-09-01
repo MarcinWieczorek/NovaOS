@@ -1,4 +1,9 @@
+#ifndef _KERNEL_TSS_H
+#define _KERNEL_TSS_H
+
 #include <stdint.h>
+
+#define TSS_ADDRESS (void *) 0xC24
 
 struct tss_entry_struct {
    uint32_t prev_tss;   // The previous TSS - if we used hardware task switching this would form a linked list.
@@ -54,4 +59,8 @@ typedef struct {
 
 void tss_write(gdt_entry_bits *);
 
+void tss_install();
+
 extern void tss_flush();
+
+#endif

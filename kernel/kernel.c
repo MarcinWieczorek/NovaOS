@@ -1,15 +1,31 @@
-#include <drivers/screen.h>
+#include <stdlib.h>
+
 #include <kernel/idt.h>
 #include <kernel/tss.h>
+
+#include <drivers/screen.h>
+
+#define MSG_OK(fmt, ...) \
+    do { \
+        puts("["); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_GREEN); \
+        puts("OK"); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        puts("] "); \
+        printf(fmt, ##__VA_ARGS__); \
+        puts("\n"); \
+    } while(0)
+
 int main() {
 
     clear_screen();
+    // Install IDT
     idt_install();
+    MSG_OK("Interrupts initialized");
 
     // Install TSS
-    void *gdt_tss = (void *) 0x7CBB; // Hardcoded address, change me!
-    tss_write(gdt_tss);
-    tss_flush();
+    tss_install();
+    MSG_OK("TSS initialized");
     return 0;
 }
 

@@ -28,3 +28,8 @@ void tss_write(gdt_entry_bits *g) {
    tss_entry.ss0  = 0x13;   // Set the kernel stack segment.
    tss_entry.esp0 = 0x452B; // Set the kernel stack pointer.
 }
+
+void tss_install() {
+    tss_write(TSS_ADDRESS);
+    tss_flush();
+}

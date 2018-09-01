@@ -30,11 +30,11 @@ gdt_user_code:           ; 3. 0x1B
 
 gdt_user_data:           ; 4. 0x23
     DW 0xFFFF
-    DW 0
-    DB 0
+    DW 0x0
+    DB 0x0
     DB 11110010b
     DB 11001111b
-    DB 0
+    DB 0x0
 
 gdt_tss:                 ; 5. 0x2B
     DW 0x0068
@@ -48,9 +48,22 @@ gdt_end:
 
 gdt_descriptor:
     DW gdt_end - gdt_start - 1
-    DD gdt_start
+    DD 0xC04
 
 CODE_SEG EQU gdt_code - gdt_start
 DATA_SEG EQU gdt_data - gdt_start
-TSS_SEG  EQU gdt_tss - gdt_start
 
+[BITS 16]
+gdt_copy:
+    XOR  ECX, ECX
+    MOV  EAX, 0xC04
+    MOV  EBX, gdt_start
+gdt_copy_loop:
+    MOV  DL, [EBX]
+    MOV  [EAX], DL
+    INC  ECX
+    INC  EAX
+    INC  EBX
+    CMP  ECX, gdt_end - gdt_start
+    JL   gdt_copy_loop
+    RET

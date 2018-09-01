@@ -6,6 +6,7 @@ MOV SP, BP                  ; Set the stack pointer
 MOV BX, MSG_REAL_MODE
 CALL println                ; Print the message
 CALL load_kernel            ; Load the kernel
+CALL gdt_copy
 CALL switch_to_pm           ; Switch to Protected Mode
 
 %include "print.asm"        ; Includes
@@ -16,9 +17,6 @@ CALL switch_to_pm           ; Switch to Protected Mode
 
 [BITS 16]
 load_kernel:
-    MOV BX, MSG_LOAD_KERNEL ; Print message
-    CALL println            ; MSG_LOAD_KERNEL
-
     MOV BX, KERNEL_OFFSET   ; Load from the disk
     MOV DH, 54
     MOV DL, [BOOT_DRIVE]
@@ -32,11 +30,9 @@ BEGIN_PM:
     CALL KERNEL_OFFSET      ; Call kernel's main()
     JMP $                   ; Hang.
 
-MSG_LOAD_KERNEL: DB "Loading the kernel",0
-MSG_REAL_MODE: DB "Started in REAL mode.",0
-MSG_PROT_MODE: DB "Switched to PROT mode.",0
-MSG_DISK_ERROR: DB "Disk read error!",0
-HEX_OUT: DB '0x0000',0      ; Pattern for HEX numbers
+MSG_REAL_MODE: DB "REALmode.",0
+MSG_PROT_MODE: DB "PROTmode.",0
+MSG_DISK_ERROR: DB "drERR",0
 BOOT_DRIVE: DB 0            ; Boot drive
 KERNEL_OFFSET EQU 0x1000    ; Kernel entry offset
 
