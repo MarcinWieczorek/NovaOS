@@ -21,7 +21,7 @@ all: os-image
 	@nasm $^ -f elf -F dwarf -g -o $@
 	@echo "AS $<"
 
-asm/kernel.bin: asm/kernel_entry.o asm/idt.o $(OBJ) $(ASM_OBJ)
+asm/kernel.bin: asm/kernel_entry.o $(OBJ) $(ASM_OBJ)
 	@ln -fs $(shell $(CC) -print-file-name=libgcc.a)
 	@echo "LN libgcc.a"
 

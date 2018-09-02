@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <kernel/idt.h>
+#include <kernel/idt/idt.h>
 #include <kernel/tss/tss.h>
 
 #include <drivers/screen.h>

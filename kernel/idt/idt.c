@@ -1,8 +1,10 @@
-#include <kernel/idt.h>
-#include <kernel/pic.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/io.h>
+#include <stdint.h>
+
+#include <kernel/idt/idt.h>
+#include <kernel/pic.h>
 #include <kernel/syscall/syscall.h>
 
 unsigned char* exception_messages[] = {
@@ -49,12 +51,12 @@ void handle_isr(struct isr_regs *r) {
             printf("Error code: %u\n", r->err_code);
         }
 
-        printf("EIP=%X\n\
-GS= %X, FS =   %X, ES =    %X, DS= %X\n\
-EDI=%X, ESI =  %X, EBP =   %X, ESP=%X\n\
-EAX=%X, EBX =  %X, ECX =   %X, EDX=%X\n\
-CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n\
-*****************************************************\n",
+        printf("EIP=%X\n"
+               "GS= %X, FS =   %X, ES =    %X, DS= %X\n"
+               "EDI=%X, ESI =  %X, EBP =   %X, ESP=%X\n"
+               "EAX=%X, EBX =  %X, ECX =   %X, EDX=%X\n"
+               "CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n"
+               "*****************************************************\n",
             (r->eip - 0x1000),
             r->gs, r->fs, r->es, r->gs,
             r->edi, r->esi, r->ebp, r->esp,
@@ -63,7 +65,9 @@ CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n\
         while(1);
     }
     else if(r->int_no == 0x80) {
-        char *vars = ((char*) r) + sizeof(struct isr_regs) + 4;
+        // Magic to get syscall's variables
+        char *vars = (char *) *((uint32_t *) ((char *) r + 0x18)) + 12;
+        short syscall_no = *(vars - 4);
 
         if(syscall_no == 4) {
                do_write(*(int*)(vars),
@@ -72,7 +76,7 @@ CS= %X, EFLAGS=%X, USERESP=%X, SS= %X\n\
         }
     }
     else {
-        printf("IRQ #%u\n", r->int_no);
+        printf("\nIRQ #%i", r->int_no);
     }
 
     PIC_sendEOI(r->int_no);
@@ -134,11 +138,9 @@ void idt_install() {
     idt_set_gate(45, (unsigned) handle_isr45, 0x08, 0x8E);
     idt_set_gate(46, (unsigned) handle_isr46, 0x08, 0x8E);
     idt_set_gate(47, (unsigned) handle_isr47, 0x08, 0x8E);
-    idt_set_gate(0x80, (unsigned) handle_isr128, 0x08, 0x8E);
+    idt_set_gate(0x80, (unsigned) handle_isr128, 0x08, 0xEE);
 
     idt_load();
-    printf("IDT initialized\n");
-
 }
 
 unsigned char keyboard_map[128] = {

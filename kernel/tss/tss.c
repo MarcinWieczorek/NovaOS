@@ -26,11 +26,8 @@ void tss_write(gdt_entry_bits *g) {
 
    memset(&tss_entry, 0, sizeof(tss_entry));
 
-   tss_entry.esp0 = 0x8ffa0; // Set the kernel stack pointer.
-   /* tss_entry.esp0 = 0x40000; // Set the kernel stack pointer. */
-   /* __asm__("movl %%esp, %0" */
-   /*         : "=a" (tss_entry.esp0)); */
-   tss_entry.ss0  = 0x13;   // Set the kernel stack segment.
+   tss_entry.esp0 = 0xA0000; // Set the kernel stack pointer.
+   tss_entry.ss0  = 0x10;   // Set the kernel stack segment.
 }
 
 void tss_install() {
