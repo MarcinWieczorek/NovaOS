@@ -3,6 +3,8 @@
 #include <sys/io.h>
 #include <stdint.h>
 
+#include <bits/syscall.h>
+
 #include <kernel/idt/idt.h>
 #include <kernel/pic.h>
 #include <kernel/syscall/syscall.h>
@@ -42,7 +44,9 @@ unsigned char* exception_messages[] = {
         "", //Reserved 31
 };
 
-void handle_isr(struct isr_regs *r) {
+long handle_isr(struct isr_regs *r) {
+    long ret = 0;
+
     if(r->int_no < 32) {
         printf("\n*****************************************************\n");
         printf("Exception #%u\n%s\n", r->int_no, exception_messages[r->int_no]);
@@ -69,10 +73,12 @@ void handle_isr(struct isr_regs *r) {
         char *vars = (char *) *((uint32_t *) ((char *) r + 0x18)) + 12;
         short syscall_no = *(vars - 4);
 
-        if(syscall_no == 4) {
-               do_write(*(int*)(vars),
-                   (const void*)*(int*)(vars + sizeof(int)),
-                   *(size_t*)(vars + sizeof(int) + sizeof(const char*)));
+        switch(syscall_no) {
+            case SYS_write:
+                ret = do_write(*(int *) vars,
+                    (const void *) *(int *) (vars + sizeof(int)),
+                    *(size_t *) (vars + sizeof(int) + sizeof(const char *)));
+                break;
         }
     }
     else {
@@ -80,6 +86,7 @@ void handle_isr(struct isr_regs *r) {
     }
 
     PIC_sendEOI(r->int_no);
+    return ret;
 }
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel,
@@ -138,6 +145,8 @@ void idt_install() {
     idt_set_gate(45, (unsigned) handle_isr45, 0x08, 0x8E);
     idt_set_gate(46, (unsigned) handle_isr46, 0x08, 0x8E);
     idt_set_gate(47, (unsigned) handle_isr47, 0x08, 0x8E);
+
+    // Syscall
     idt_set_gate(0x80, (unsigned) handle_isr128, 0x08, 0xEE);
 
     idt_load();

@@ -216,6 +216,7 @@ handle_isr47:
     PUSH BYTE 47
 handle_isr128:
     CLI
+    SUB ESP, 4
     PUSH BYTE 0
     PUSH BYTE 0
     MOV BYTE [ESP], 0x80
@@ -235,12 +236,18 @@ handle_isr_common:          ; Common handler caller
     PUSH EAX
     MOV EAX, handle_isr
     CALL EAX                ; Call C handler
+    MOV [ESP + 0x3C], EAX
     POP EAX
     POP GS
     POP FS
     POP ES
     POP DS
     POPA
+    CMP BYTE [ESP], 0x80
+    JNE handle_isr_common_end
+    MOV DWORD EAX, [ESP + 8]
+    ADD ESP, 4
+handle_isr_common_end:
     ADD ESP, 8
     IRET                    ; Return from interrupt
 

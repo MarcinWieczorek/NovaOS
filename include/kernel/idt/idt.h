@@ -75,6 +75,6 @@ void idt_install(void);
 
 void handle_exception(int exception, int code_size);
 
-void handle_isr(struct isr_regs *r);
+long handle_isr(struct isr_regs *r);
 
 #endif

@@ -51,6 +51,11 @@ debug:
 		-ex="symbol-file kernel.elf" \
 		-ex="set disassembly-flavor intel"
 
+debug-qemu: os-image
+	$(QEMU) os-image \
+		-monitor stdio -m 1 -s -S \
+		-d guest_errors,cpu_reset,int
+
 clean:
 	@for f in `find . -name "*.bin" -o -name "*.o" -o -name "os-image" -o -wholename "libc/include/bits/*.h" -o -name "libgcc.a"`; do \
 		rm $$f; \
