@@ -2,219 +2,231 @@
 [EXTERN idtp]
 [EXTERN handle_isr]         ; Common handler
 
-[GLOBAL handle_isr0]        ; 0-32 exception handlers
-[GLOBAL handle_isr1]
-[GLOBAL handle_isr2]
-[GLOBAL handle_isr3]
-[GLOBAL handle_isr4]
-[GLOBAL handle_isr5]
-[GLOBAL handle_isr6]
-[GLOBAL handle_isr7]
-[GLOBAL handle_isr8]
-[GLOBAL handle_isr9]
-[GLOBAL handle_isr10]
-[GLOBAL handle_isr11]
-[GLOBAL handle_isr12]
-[GLOBAL handle_isr13]
-[GLOBAL handle_isr14]
-[GLOBAL handle_isr15]
-[GLOBAL handle_isr16]
-[GLOBAL handle_isr17]
-[GLOBAL handle_isr18]
-[GLOBAL handle_isr19]
-[GLOBAL handle_isr20]
-[GLOBAL handle_isr30]
-[GLOBAL handle_isr31]
-[GLOBAL handle_isr32]
-[GLOBAL handle_isr33]       ; Keyboard interrupt
-[GLOBAL handle_isr34]
-[GLOBAL handle_isr35]
-[GLOBAL handle_isr36]
-[GLOBAL handle_isr37]
-[GLOBAL handle_isr38]
-[GLOBAL handle_isr39]
-[GLOBAL handle_isr40]
-[GLOBAL handle_isr41]
-[GLOBAL handle_isr42]
-[GLOBAL handle_isr43]
-[GLOBAL handle_isr44]
-[GLOBAL handle_isr45]
-[GLOBAL handle_isr46]
-[GLOBAL handle_isr47]       ; IRQ15
-[GLOBAL handle_isr128]      ; 0x80 syscall
+[GLOBAL handle_isr_0]        ; 0-32 exception handlers
+[GLOBAL handle_isr_1]
+[GLOBAL handle_isr_2]
+[GLOBAL handle_isr_3]
+[GLOBAL handle_isr_4]
+[GLOBAL handle_isr_5]
+[GLOBAL handle_isr_6]
+[GLOBAL handle_isr_7]
+[GLOBAL handle_isr_8]
+[GLOBAL handle_isr_9]
+[GLOBAL handle_isr_A]
+[GLOBAL handle_isr_B]
+[GLOBAL handle_isr_C]
+[GLOBAL handle_isr_D]
+[GLOBAL handle_isr_E]
+[GLOBAL handle_isr_F]
+[GLOBAL handle_isr_10]
+[GLOBAL handle_isr_11]
+[GLOBAL handle_isr_12]
+[GLOBAL handle_isr_13]
+[GLOBAL handle_isr_14]
+[GLOBAL handle_isr_1E]
+[GLOBAL handle_isr_1F]
+[GLOBAL handle_isr_20]
+[GLOBAL handle_isr_21]       ; Keyboard interrupt
+[GLOBAL handle_isr_22]
+[GLOBAL handle_isr_23]
+[GLOBAL handle_isr_24]
+[GLOBAL handle_isr_25]
+[GLOBAL handle_isr_26]
+[GLOBAL handle_isr_27]
+[GLOBAL handle_isr_28]
+[GLOBAL handle_isr_29]
+[GLOBAL handle_isr_2A]
+[GLOBAL handle_isr_2B]
+[GLOBAL handle_isr_2C]
+[GLOBAL handle_isr_2D]
+[GLOBAL handle_isr_2E]
+[GLOBAL handle_isr_2F]       ; IRQ15
+[GLOBAL handle_isr_80]       ; 0x80 syscall
 
 idt_load:                   ; Init IDT
     LIDT [idtp]
     STI
     RET
 
-handle_isr0:
+handle_isr_0:
     CLI
     PUSH BYTE 0
     PUSH BYTE 0
     JMP handle_isr_common
-handle_isr1:
+handle_isr_1:
     CLI
     PUSH BYTE 0
     PUSH BYTE 1
     JMP handle_isr_common
-handle_isr2:
+handle_isr_2:
     CLI
     PUSH BYTE 0
     PUSH BYTE 2
     JMP handle_isr_common
-handle_isr3:
+handle_isr_3:
     CLI
     PUSH BYTE 0
     PUSH BYTE 3
     JMP handle_isr_common
-handle_isr4:
+handle_isr_4:
     CLI
     PUSH BYTE 0
     PUSH BYTE 4
     JMP handle_isr_common
-handle_isr5:
+handle_isr_5:
     CLI
     PUSH BYTE 0
     PUSH BYTE 5
     JMP handle_isr_common
-handle_isr6:
+handle_isr_6:
     CLI
     PUSH BYTE 0
     PUSH BYTE 6
     JMP handle_isr_common
-handle_isr7:
+handle_isr_7:
     CLI
     PUSH BYTE 0
     PUSH BYTE 7
     JMP handle_isr_common
-handle_isr8:
+handle_isr_8:
     CLI
     PUSH BYTE 8
     JMP handle_isr_common
-handle_isr9:
+handle_isr_9:
     CLI
     PUSH BYTE 0
     PUSH BYTE 9
     JMP handle_isr_common
-handle_isr10:
+handle_isr_A:
     CLI
-    PUSH BYTE 10
+    PUSH BYTE 0xA
     JMP handle_isr_common
-handle_isr11:
+handle_isr_B:
     CLI
-    PUSH BYTE 11
+    PUSH BYTE 0xB
     JMP handle_isr_common
-handle_isr12:
+handle_isr_C:
     CLI
-    PUSH BYTE 12
+    PUSH BYTE 0xC
     JMP handle_isr_common
-handle_isr13:
+handle_isr_D:
     CLI
-    PUSH BYTE 13
+    PUSH BYTE 0xD
     JMP handle_isr_common
-handle_isr14:
+handle_isr_E:
     CLI
-    PUSH BYTE 14
+    PUSH BYTE 0xE
     JMP handle_isr_common
-handle_isr16:
+handle_isr_10:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 16
+    PUSH BYTE 0x10
     JMP handle_isr_common
-handle_isr17:
+handle_isr_11:
     CLI
-    PUSH BYTE 17
+    PUSH BYTE 0x11
     JMP handle_isr_common
-handle_isr18:
+handle_isr_12:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 18
+    PUSH BYTE 0x12
     JMP handle_isr_common
-handle_isr19:
+handle_isr_13:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 19
+    PUSH BYTE 0x13
     JMP handle_isr_common
-handle_isr20:
+handle_isr_14:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 20
+    PUSH BYTE 0x14
     JMP handle_isr_common
-handle_isr30:
+handle_isr_1E:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 30
+    PUSH BYTE 0x1E
     JMP handle_isr_common
-handle_isr32:
+handle_isr_20:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 32
+    PUSH BYTE 0x20
     JMP handle_isr_common
-handle_isr33:
+handle_isr_21:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 33
+    PUSH BYTE 0x21
     JMP handle_isr_common
-handle_isr34:
+handle_isr_22:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 34
+    PUSH BYTE 0x22
     JMP handle_isr_common
-handle_isr35:
+handle_isr_23:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 35
+    PUSH BYTE 0x23
     JMP handle_isr_common
-handle_isr36:
+handle_isr_24:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 36
-handle_isr37:
+    PUSH BYTE 0x24
+    JMP handle_isr_common
+handle_isr_25:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 37
-handle_isr38:
+    PUSH BYTE 0x25
+    JMP handle_isr_common
+handle_isr_26:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 38
-handle_isr39:
+    PUSH BYTE 0x26
+    JMP handle_isr_common
+handle_isr_27:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 39
-handle_isr40:
+    PUSH BYTE 0x27
+    JMP handle_isr_common
+handle_isr_28:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 40
-handle_isr41:
+    PUSH BYTE 0x28
+    JMP handle_isr_common
+handle_isr_29:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 41
-handle_isr42:
+    PUSH BYTE 0x29
+    JMP handle_isr_common
+handle_isr_2A:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 42
-handle_isr43:
+    PUSH BYTE 0x2A
+    JMP handle_isr_common
+handle_isr_2B:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 43
-handle_isr44:
+    PUSH BYTE 0x2B
+    JMP handle_isr_common
+handle_isr_2C:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 44
-handle_isr45:
+    PUSH BYTE 0x2C
+    JMP handle_isr_common
+handle_isr_2D:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 45
-handle_isr46:
+    PUSH BYTE 0x2D
+    JMP handle_isr_common
+handle_isr_2E:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 46
-handle_isr47:
+    PUSH BYTE 0x2E
+    JMP handle_isr_common
+handle_isr_2F:
     CLI
     PUSH BYTE 0
-    PUSH BYTE 47
-handle_isr128:
+    PUSH BYTE 0x2F
+    JMP handle_isr_common
+handle_isr_80:
     CLI
     SUB ESP, 4
     PUSH BYTE 0
