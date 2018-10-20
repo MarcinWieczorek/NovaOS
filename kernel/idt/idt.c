@@ -85,6 +85,10 @@ long handle_isr(struct isr_regs *r) {
                     (const void *) *(int *) (vars + sizeof(int)),
                     *(size_t *) (vars + sizeof(int) + sizeof(const char *)));
                 break;
+            case SYS_open:
+                ret = do_open(*(const char **) vars,
+                    *(int *) (vars + sizeof(const char)));
+                break;
             case SYS_time:
                 ret = do_time((time_t *) *(int *) vars);
                 break;

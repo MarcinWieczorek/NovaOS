@@ -153,6 +153,7 @@ handle_isr_20:
     JMP handle_isr_common
 handle_isr_21:
     CLI
+    SUB ESP, 4
     PUSH BYTE 0
     PUSH BYTE 0x21
     JMP handle_isr_common
@@ -255,8 +256,6 @@ handle_isr_common:          ; Common handler caller
     POP ES
     POP DS
     POPA
-    CMP BYTE [ESP], 0x80
-    JNE handle_isr_common_end
     MOV DWORD EAX, [ESP + 8]
     ADD ESP, 4
 handle_isr_common_end:

@@ -59,7 +59,14 @@ debug-qemu: os-image
 		-d guest_errors,cpu_reset,int
 
 clean:
-	@for f in `find . -path "./fatmnt" -prune -o -name "*.bin" -o -name "*.o" -o -name "os-image" -o -wholename "libc/include/bits/*.h" -o -name "libgcc.a"`; do \
+	@for f in `find . -path "./fatmnt" -prune \
+		-o -name "*.bin" \
+		-o -name "*.o" \
+		-o -name "os-image" \
+		-o -name "*.elf" \
+		-o -name "*.sym" \
+		-o -wholename "libc/include/bits/*.h" \
+		-o -name "libgcc.a"`; do \
 		rm $$f; \
 	done
 

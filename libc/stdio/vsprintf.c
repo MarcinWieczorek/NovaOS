@@ -26,6 +26,10 @@ int vsprintf(char *str, const char *format, __isoc_va_list args) {
                 strcpy(str, s);
                 str += strlen(s);
             }
+            else if(specifier == 'c') {
+                char c = va_arg(args, int);
+                *(str++) = c;
+            }
             else if(specifier == '%') {
                 *(str++) = '%';
             }

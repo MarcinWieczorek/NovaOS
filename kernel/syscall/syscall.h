@@ -9,6 +9,8 @@ ssize_t do_read(int, void *, size_t);
 
 ssize_t do_write(int fildes, const void *buf, size_t nbyte);
 
+int do_open(const char *, int, ...);
+
 off_t do_lseek(int, off_t, int);
 
 #include <time.h>
