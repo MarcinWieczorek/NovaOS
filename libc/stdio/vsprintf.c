@@ -17,7 +17,7 @@ int vsprintf(char *str, const char *format, __isoc_va_list args) {
     while((int) format < stop) {
         char c = *(format);
 
-        if(c == '%' || isdigit(c)) {
+        if(c == '%') {
             format++;
             char specifier = *format;
 

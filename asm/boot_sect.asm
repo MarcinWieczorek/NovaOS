@@ -17,10 +17,15 @@ CALL switch_to_pm           ; Switch to Protected Mode
 
 [BITS 16]
 load_kernel:
-    MOV BX, KERNEL_OFFSET   ; Load from the disk
-    MOV DH, 54
+    MOV BX, 0
+    MOV CL, 2               ; Start reading from 2nd sector (after boot)
+    MOV DH, 52
+    MOV CH, 0x00            ; Select cylinder 0
+    PUSH 0x1000
+    POP ES
     MOV DL, [BOOT_DRIVE]
     CALL disk_load
+
     RET
 
 [BITS 32]
@@ -30,11 +35,11 @@ BEGIN_PM:
     CALL KERNEL_OFFSET      ; Call kernel's main()
     JMP $                   ; Hang.
 
-MSG_REAL_MODE: DB "REALmode.",0
-MSG_PROT_MODE: DB "PROTmode.",0
+MSG_REAL_MODE: DB "RM.",0
+MSG_PROT_MODE: DB "PM.",0
 MSG_DISK_ERROR: DB "drERR",0
 BOOT_DRIVE: DB 0            ; Boot drive
-KERNEL_OFFSET EQU 0x1000    ; Kernel entry offset
+KERNEL_OFFSET EQU 0x10000    ; Kernel entry offset
 
 TIMES 510-($-$$) DB 0       ; End of the
 DW 0xAA55                   ; boot sector

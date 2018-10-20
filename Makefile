@@ -29,13 +29,15 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ) $(ASM_OBJ)
 	  -zmuldefs \
 	  -m elf_i386 \
 	  --entry=main \
-	  -Ttext=0x1000 \
+	  -Ttext=0x10000 \
 	  $^ \
 	  libgcc.a
 	@echo "LD kernel.elf"
 
 	@objcopy --only-keep-debug kernel.elf kernel.sym
-	@objcopy -O binary kernel.elf asm/kernel.bin
+	@cp kernel.elf kernel_strip.elf
+	@strip --remove-section=.note.gnu.property kernel_strip.elf 2>/dev/null
+	@objcopy -O binary kernel_strip.elf asm/kernel.bin
 	@echo "OC kernel.bin"
 
 %.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h libc/include/bits/syscall.h
@@ -52,12 +54,12 @@ debug:
 		-ex="set disassembly-flavor intel"
 
 debug-qemu: os-image
-	$(QEMU) os-image \
+	$(QEMU) -drive format=raw,file=$^ \
 		-monitor stdio -m 1 -s -S \
 		-d guest_errors,cpu_reset,int
 
 clean:
-	@for f in `find . -name "*.bin" -o -name "*.o" -o -name "os-image" -o -wholename "libc/include/bits/*.h" -o -name "libgcc.a"`; do \
+	@for f in `find . -path "./fatmnt" -prune -o -name "*.bin" -o -name "*.o" -o -name "os-image" -o -wholename "libc/include/bits/*.h" -o -name "libgcc.a"`; do \
 		rm $$f; \
 	done
 

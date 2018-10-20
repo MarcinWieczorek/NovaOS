@@ -1,8 +1,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/io.h>
+#define __NEED_off_t
+#include <bits/alltypes.h>
 #include <stdint.h>
-
 #include <bits/syscall.h>
 
 #include <kernel/idt/idt.h>
@@ -74,6 +75,11 @@ long handle_isr(struct isr_regs *r) {
         short syscall_no = *(vars - 4);
 
         switch(syscall_no) {
+            case SYS_read:
+                ret = do_read(*(int *) vars,
+                    (void *) *(int *) (vars + sizeof(int)),
+                    *(size_t *) (vars + sizeof(int) + sizeof(char *)));
+                break;
             case SYS_write:
                 ret = do_write(*(int *) vars,
                     (const void *) *(int *) (vars + sizeof(int)),
@@ -81,6 +87,11 @@ long handle_isr(struct isr_regs *r) {
                 break;
             case SYS_time:
                 ret = do_time((time_t *) *(int *) vars);
+                break;
+            case SYS_lseek:
+                ret = do_lseek(*(unsigned int *) vars,
+                    *(off_t *) (vars + sizeof(int)),
+                    *(unsigned int *) (vars + sizeof(int) + sizeof(off_t *)));
                 break;
         }
     }

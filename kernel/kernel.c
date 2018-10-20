@@ -21,11 +21,15 @@ int main() {
     clear_screen();
     // Install IDT
     idt_install();
-    MSG_OK("Interrupts initialized");
+    MSG_OK("IDT initialized");
 
     // Install TSS
     tss_install();
     MSG_OK("TSS initialized");
+
+    // Install VFS
+    vfs_init();
+    MSG_OK("VFS initialized");
     return 0;
 }
 
