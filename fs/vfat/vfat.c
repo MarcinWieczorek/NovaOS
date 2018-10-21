@@ -61,7 +61,6 @@ vfs_fs_t *VFAT_init(device_t *dev) {
     uint32_t *fat = &static_fat[0];
     vfatfs->fat = fat;
     dev->read(dev, (uint8_t *) fat, h->BPB_RsvdSecCnt * h->BPB_BytsPerSec, h->BPB_BytsPerSec);
-
     return fs;
 }
 
@@ -119,7 +118,6 @@ void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
                 + vfat->header->BPB_BytsPerSec - 1)
             / vfat->header->BPB_BytsPerSec) * vfat->header->BPB_BytsPerSec,
                   vfat->header->BPB_BytsPerSec);
-                  vfat->header->BPB_BytsPerSec);
 }
 
 uint8_t VFAT_fat_hasnext(vfs_fs_t *fs, uint32_t entry) {
@@ -160,10 +158,10 @@ VFAT_directory_entry *VFAT_read_dir_root(vfs_fs_t *fs) {
         cluster = 0;
     }
 
-    return VFAT_read_dir(fs, cluster);
+    return VFAT_read_dir_clus(fs, cluster - 2);
 }
 
-VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *fs, uint32_t cluster) {
+VFAT_directory_entry *VFAT_read_dir_clus(vfs_fs_t *fs, uint32_t cluster) {
     fs_vfat_t *vfat = fs->priv;
     VFAT_header *h = vfat->header;
     uint8_t *buf = calloc(h->BPB_BytsPerSec * h->BPB_SecPerClus,
@@ -172,76 +170,104 @@ VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *fs, uint32_t cluster) {
     return (VFAT_directory_entry *) buf;
 }
 
+VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *fs, VFAT_directory_entry *d) {
+    return VFAT_read_dir_clus(fs, (d->fst_clus_hi << 16) | d->fst_clus_lo);
+}
+
 void VFAT_free(fs_vfat_t *vfat) {
     free(vfat->header);
     free(vfat->fat);
     free(vfat);
 }
 
-/* VFAT_directory_entry *VFAT_find_in_dir() */
+uint8_t *VFAT_get_name_fat(char *str) {
+    uint8_t *name = malloc(12);
+    char *dotpos = strchr(str, '.');
+    memset(name, ' ', 11);
+    name[11] = '\0';
+    if(dotpos != NULL) {
+        strncpy(name, str, dotpos - str);
+        strncpy(name + 8, dotpos + 1, 3);
+    }
+    else {
+        strncpy(name, str, strlen(str));
+    }
+    return name;
+}
 
-VFAT_directory_entry *VFAT_find_dir_entry(vfs_fs_t *fs, char *filename) {
-    VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
-    VFAT_directory_entry *dir = NULL;
-    uint8_t name[13];
+VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
+                                          VFAT_directory_entry *search_dir,
+                                          char *filename) {
+    char *rname = strchr(filename, '/');
+    int dname_len = rname - filename;
+    char *dname = malloc(dname_len + 1);
+    strncpy(dname, filename, dname_len);
+    dname[dname_len] = '\0';
+    uint8_t *fatdname = VFAT_get_name_fat(dname);
+    uint8_t *fatrname = VFAT_get_name_fat(rname + 1);
+
+    VFAT_directory_entry *next_dir = NULL;
 
     for(int di = 0; di < 512 / sizeof(VFAT_directory_entry); di++) {
-        VFAT_directory_entry *d = root_dir + di;
-
-        uint8_t n0 = d->name[0];
-
-        if(n0 == 'A' || d->attr == FAT_DIR_ATTR_LONGNAME) {
-            continue;
+        VFAT_directory_entry *d = search_dir + di;
+        if(d->attr == 0) {
+            break;
         }
 
-        int name_pos = 0;
-        for(int ni = 0; ni < 11; ni++) {
-            if(d->name[ni] == ' ') {
+        if(*dname) {
+            if(d->attr != VFAT_DIR_ATTR_DIRECTORY) {
                 continue;
             }
 
-            if(ni == 8) {
-                name[name_pos++] = '.';
+            if(strncmp(fatdname, d->name, 11) == 0) {
+                next_dir = d;
+                break;
             }
-
-            name[name_pos++] = d->name[ni];
         }
+        else {
 
-        name[name_pos] = '\0';
-
-        if(strncmp(filename, name, 11) == 0) {
-            dir = d;
-            break;
+            if(strncmp(fatrname, d->name, 11) == 0) {
+                free(fatdname);
+                free(fatrname);
+                free(dname);
+                return d;
+            }
         }
     }
 
-    if(dir == NULL) {
-        free(root_dir);
-        return NULL;
+    free(fatrname);
+    free(fatdname);
+    if(next_dir != NULL) {
+        VFAT_directory_entry *next_dir_content = VFAT_read_dir(fs, next_dir);
+        return VFAT_find_in_dir_re(fs, next_dir_content, rname);
     }
 
-    VFAT_directory_entry *dir_copy = malloc(sizeof(VFAT_directory_entry));
-    memcpy(dir_copy, dir, sizeof(VFAT_directory_entry));
-    free(root_dir);
-    return dir_copy;
+    free(dname);
+    return NULL;
 }
 
 uint32_t VFAT_file_size(vfs_fs_t *fs, char *filename) {
-    return VFAT_find_dir_entry(fs, filename)->file_size;
+    VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
+    VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
+    free(root_dir);
+    return dir->file_size;
 }
 
 void VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
     char *filename = fds->path + strlen(fds->mp->location);
-    VFAT_directory_entry *dir = VFAT_find_dir_entry(fs, filename);
+    VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
+    VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
+    free(root_dir);
 
     if(dir == NULL) {
         return;
     }
 
-    uint32_t clus = dir->fst_clus_lo | (dir->fst_clus_hi << 8);
+    uint32_t clus = dir->fst_clus_lo | (dir->fst_clus_hi << 16);
     uint8_t *file_buf = malloc(dir->file_size);
     VFAT_read_chain(fs, clus, file_buf);
     memcpy(buf, file_buf + fds->seek, n);
     free(file_buf);
     free(dir);
 }
+

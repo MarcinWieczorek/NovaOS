@@ -5,18 +5,18 @@
 
 #include <fs/vfs/vfs.h>
 
-#define FAT_ENTRY_FREE 0x0
-#define FAT_ENTRY_EOF 0xFFFFFFFF
-#define FAT_ENTRY_BAD 0xFFFFFFF7
+#define VFAT_ENTRY_FREE 0x0
+#define VFAT_ENTRY_EOF 0xFFFFFFFF
+#define VFAT_ENTRY_BAD 0xFFFFFFF7
 
-#define FAT_DIR_ATTR_READ_ONLY 0x01
-#define FAT_DIR_ATTR_HIDDEN    0x02
-#define FAT_DIR_ATTR_SYSTEM    0x04
-#define FAT_DIR_ATTR_VOLUME_ID 0x08
-#define FAT_DIR_ATTR_DIRECTORY 0x10
-#define FAT_DIR_ATTR_ARCHIVE   0x20
-#define FAT_DIR_ATTR_LONGNAME (FAT_DIR_ATTR_READ_ONLY \
-        | FAT_DIR_ATTR_HIDDEN | FAT_DIR_ATTR_SYSTEM | FAT_DIR_ATTR_VOLUME_ID)
+#define VFAT_DIR_ATTR_READ_ONLY 0x01
+#define VFAT_DIR_ATTR_HIDDEN    0x02
+#define VFAT_DIR_ATTR_SYSTEM    0x04
+#define VFAT_DIR_ATTR_VOLUME_ID 0x08
+#define VFAT_DIR_ATTR_DIRECTORY 0x10
+#define VFAT_DIR_ATTR_ARCHIVE   0x20
+#define FAT_DIR_ATTR_LONGNAME (VFAT_DIR_ATTR_READ_ONLY \
+        | VFAT_DIR_ATTR_HIDDEN | VFAT_DIR_ATTR_SYSTEM | VFAT_DIR_ATTR_VOLUME_ID)
 
 typedef struct {
     uint8_t  BS_jmpBoot[3];
@@ -88,7 +88,9 @@ void VFAT_read_chain(vfs_fs_t *fs, uint32_t cluster, uint8_t *);
 
 VFAT_directory_entry *VFAT_read_dir_root(vfs_fs_t *);
 
-VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *, uint32_t);
+VFAT_directory_entry *VFAT_read_dir_clus(vfs_fs_t *, uint32_t);
+
+VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *, VFAT_directory_entry *);
 
 uint8_t VFAT_fat_hasnext(vfs_fs_t *fs, uint32_t entry);
 
