@@ -1,7 +1,10 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <kernel/idt/idt.h>
 #include <kernel/tss/tss.h>
+
+#include <fs/vfs/vfs.h>
 
 #include <drivers/screen.h>
 
@@ -16,7 +19,7 @@
         puts("\n"); \
     } while(0)
 
-int main() {
+int main(void) {
 
     clear_screen();
     // Install IDT

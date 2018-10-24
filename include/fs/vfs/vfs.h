@@ -2,6 +2,7 @@
 #define _FS_VFS_VFS_H
 
 #define __NEED_size_t
+#define __NEED_ssize_t
 #define __NEED_off_t
 #include <bits/alltypes.h>
 
@@ -10,7 +11,7 @@
 #define VFS_MOUNTPOINTS_MAX 16
 #define VFS_FD_MAX 16
 
-#define vfs_fd_empty(fd) (fdlist[fd].fd == -1)
+#define vfs_fd_empty(__fd) (fdlist[__fd].fd == -1)
 
 struct __vfs_mountpoint;
 
@@ -24,7 +25,7 @@ typedef struct {
 
 typedef struct __vfs_fs {
     char *name;
-    void (*write)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
+    ssize_t (*write)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
     void (*read)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
     void *priv;
     device_t *dev;
@@ -40,7 +41,7 @@ vfs_mountpoint_t *vfs_find_mountpoint(char *);
 
 void vfs_read(vfs_fdstruct *, uint8_t *, size_t);
 
-void vfs_write(vfs_fdstruct *, uint8_t *, size_t);
+ssize_t vfs_write(vfs_fdstruct *, uint8_t *, size_t);
 
 off_t vfs_seek(int, off_t, int);
 

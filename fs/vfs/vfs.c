@@ -47,7 +47,7 @@ vfs_mountpoint_t *vfs_find_mountpoint(char *path) {
 void vfs_init() {
     void *arr = calloc(VFS_MOUNTPOINTS_MAX, sizeof(vfs_mountpoint_t *));
     vfs_mountpoints = ordered_array_new(arr, VFS_MOUNTPOINTS_MAX, &vfs_mount_compare);
-    fdlist = calloc(VFS_FD_MAX, sizeof(vfs_fdstruct *));
+    fdlist = calloc(VFS_FD_MAX, sizeof(vfs_fdstruct));
 
     for(int i = 0; i < VFS_FD_MAX; i++) {
         fdlist[i].fd = -1;
@@ -85,6 +85,15 @@ void vfs_read(vfs_fdstruct *fds, uint8_t *buffer, size_t size) {
     fds->seek += size;
 }
 
+ssize_t vfs_write(vfs_fdstruct *fds, uint8_t *buf, size_t n) {
+    if(fds == NULL || fds->fd == -1) {
+        return 0;
+    }
+
+    fds->mp->fs->write(fds->mp->fs, fds, buf, n);
+    fds->seek += n;
+}
+
 off_t vfs_seek(int fd, off_t offset, int whence) {
     vfs_fdstruct *fds = vfs_get_fdstruct(fd);
     off_t newseek;
@@ -109,8 +118,9 @@ int vfs_open(char *path, int mode) {
     vfs_fdstruct *fds;
     int fd = -1;
 
-    for(fd = 0; fd < VFS_FD_MAX; fd++) {
-        if(vfs_fd_empty(fd)) {
+    for(int fdl = 3; fdl < VFS_FD_MAX; fdl++) {
+        if(vfs_fd_empty(fdl)) {
+            fd = fdl;
             break;
         }
     }

@@ -13,6 +13,7 @@ vfs_fs_t *VFAT_init(device_t *dev) {
     fs->priv = vfatfs;
     fs->name = "VFAT";
     fs->read = &VFAT_read;
+    fs->write = &VFAT_write;
     VFAT_header *h = malloc(sizeof(VFAT_header));
     vfatfs->header = h;
     dev->read(dev, (uint8_t *) h, 0, sizeof(VFAT_header));
@@ -106,18 +107,27 @@ uint32_t VFAT_read_fat(vfs_fs_t *fs, uint32_t entry) {
     return vfat->fat[entry];
 }
 
-void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
-    /* printf("READING cluster 0x%X\n", cluster); */
-    cluster -= 2;
+uint32_t VFAT_get_offset_cluster(vfs_fs_t *fs, uint32_t cluster) {
     fs_vfat_t *vfat = fs->priv;
-    fs->dev->read(fs->dev, buf,
-            (vfat->header->BPB_RsvdSecCnt
-            + cluster * vfat->header->BPB_SecPerClus
+    return (vfat->header->BPB_RsvdSecCnt
+            + (cluster - 2) * vfat->header->BPB_SecPerClus
             + (vfat->header->BPB_NumFATs * vfat->fatsz)
             + (vfat->header->BPB_RootEntCnt * 32
                 + vfat->header->BPB_BytsPerSec - 1)
-            / vfat->header->BPB_BytsPerSec) * vfat->header->BPB_BytsPerSec,
+            / vfat->header->BPB_BytsPerSec) * vfat->header->BPB_BytsPerSec;
+}
+
+void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
+    fs_vfat_t *vfat = fs->priv;
+    fs->dev->read(fs->dev, buf, VFAT_get_offset_cluster(fs, cluster),
                   vfat->header->BPB_BytsPerSec);
+}
+
+void VFAT_write_cluster(vfs_fs_t *fs, uint32_t cluster, off_t offset,
+                        uint8_t *buf, size_t n) {
+    fs_vfat_t *vfat = fs->priv;
+    fs->dev->write(fs->dev, buf,
+                   VFAT_get_offset_cluster(fs, cluster) + offset, n);
 }
 
 uint8_t VFAT_fat_hasnext(vfs_fs_t *fs, uint32_t entry) {
@@ -142,6 +152,38 @@ void VFAT_read_chain(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
     do {
         VFAT_read_cluster(fs, cluster, buf);
         buf += vfat->header->BPB_BytsPerSec;
+        entry = VFAT_fat_entry(fs, cluster);
+        cluster = entry;
+    } while(VFAT_fat_hasnext(fs, entry));
+}
+
+ssize_t VFAT_write_chain(vfs_fs_t *fs, uint32_t cluster, off_t offset,
+                         uint8_t *buf, size_t n) {
+    fs_vfat_t *vfat = fs->priv;
+    uint32_t entry;
+    uint32_t bpc = vfat->header->BPB_BytsPerSec * vfat->header->BPB_SecPerClus;
+
+    do {
+        if(n <= 0) {
+            break;
+        }
+
+        if(offset == 0) {
+            VFAT_write_cluster(fs, cluster, 0, buf, n);
+            buf += bpc;
+            n -= bpc;
+        }
+        else if(offset < bpc) {
+            uint32_t ncluster = n > bpc ? bpc - offset : n;
+            VFAT_write_cluster(fs, cluster, offset, buf, ncluster);
+            buf += bpc - offset;
+            n -= ncluster;
+            offset = 0;
+        }
+        else {
+            offset -= bpc;
+        }
+
         entry = VFAT_fat_entry(fs, cluster);
         cluster = entry;
     } while(VFAT_fat_hasnext(fs, entry));
@@ -180,9 +222,9 @@ void VFAT_free(fs_vfat_t *vfat) {
     free(vfat);
 }
 
-uint8_t *VFAT_get_name_fat(char *str) {
+uint8_t *VFAT_get_name_fat(uint8_t *str) {
     uint8_t *name = malloc(12);
-    char *dotpos = strchr(str, '.');
+    uint8_t *dotpos = strchr(str, '.');
     memset(name, ' ', 11);
     name[11] = '\0';
     if(dotpos != NULL) {
@@ -197,10 +239,10 @@ uint8_t *VFAT_get_name_fat(char *str) {
 
 VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
                                           VFAT_directory_entry *search_dir,
-                                          char *filename) {
-    char *rname = strchr(filename, '/');
+                                          uint8_t *filename) {
+    uint8_t *rname = strchr(filename, '/');
     int dname_len = rname - filename;
-    char *dname = malloc(dname_len + 1);
+    uint8_t *dname = malloc(dname_len + 1);
     strncpy(dname, filename, dname_len);
     dname[dname_len] = '\0';
     uint8_t *fatdname = VFAT_get_name_fat(dname);
@@ -246,7 +288,7 @@ VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
     return NULL;
 }
 
-uint32_t VFAT_file_size(vfs_fs_t *fs, char *filename) {
+uint32_t VFAT_file_size(vfs_fs_t *fs, uint8_t *filename) {
     VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
     VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
     free(root_dir);
@@ -254,7 +296,7 @@ uint32_t VFAT_file_size(vfs_fs_t *fs, char *filename) {
 }
 
 void VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
-    char *filename = fds->path + strlen(fds->mp->location);
+    uint8_t *filename = fds->path + strlen(fds->mp->location);
     VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
     VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
     free(root_dir);
@@ -269,5 +311,20 @@ void VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
     memcpy(buf, file_buf + fds->seek, n);
     free(file_buf);
     free(dir);
+}
+
+ssize_t VFAT_write(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
+    uint8_t *filename = fds->path + strlen(fds->mp->location);
+    VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
+    VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
+    free(root_dir);
+
+    if(dir == NULL) {
+        return 0;
+    }
+
+    uint32_t clus = dir->fst_clus_lo | (dir->fst_clus_hi << 16);
+    free(dir);
+    return VFAT_write_chain(fs, clus, fds->seek, buf, n);
 }
 

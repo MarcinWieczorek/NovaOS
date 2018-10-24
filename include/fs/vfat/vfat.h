@@ -86,6 +86,9 @@ void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *);
 
 void VFAT_read_chain(vfs_fs_t *fs, uint32_t cluster, uint8_t *);
 
+ssize_t VFAT_write_chain(vfs_fs_t *fs, uint32_t cluster, off_t offset,
+                      uint8_t *buf, size_t n);
+
 VFAT_directory_entry *VFAT_read_dir_root(vfs_fs_t *);
 
 VFAT_directory_entry *VFAT_read_dir_clus(vfs_fs_t *, uint32_t);
@@ -95,5 +98,7 @@ VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *, VFAT_directory_entry *);
 uint8_t VFAT_fat_hasnext(vfs_fs_t *fs, uint32_t entry);
 
 void VFAT_read(vfs_fs_t *, vfs_fdstruct *, uint8_t *, size_t);
+
+ssize_t VFAT_write(vfs_fs_t *, vfs_fdstruct *, uint8_t *, size_t);
 
 #endif

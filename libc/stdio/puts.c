@@ -3,5 +3,5 @@
 #include <string.h>
 
 int puts(const char *str) {
-    return write(0, str, strlen(str));
+    return write(STDOUT_FILENO, str, strlen(str));
 }
