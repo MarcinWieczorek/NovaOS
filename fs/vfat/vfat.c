@@ -295,14 +295,14 @@ uint32_t VFAT_file_size(vfs_fs_t *fs, uint8_t *filename) {
     return dir->file_size;
 }
 
-void VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
+ssize_t VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
     uint8_t *filename = fds->path + strlen(fds->mp->location);
     VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
     VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
     free(root_dir);
 
     if(dir == NULL) {
-        return;
+        return 0;
     }
 
     uint32_t clus = dir->fst_clus_lo | (dir->fst_clus_hi << 16);
@@ -311,6 +311,7 @@ void VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
     memcpy(buf, file_buf + fds->seek, n);
     free(file_buf);
     free(dir);
+    return n;
 }
 
 ssize_t VFAT_write(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {

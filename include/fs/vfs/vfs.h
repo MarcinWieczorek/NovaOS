@@ -26,7 +26,7 @@ typedef struct {
 typedef struct __vfs_fs {
     char *name;
     ssize_t (*write)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
-    void (*read)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
+    ssize_t (*read)(struct __vfs_fs *, vfs_fdstruct *, uint8_t *, size_t);
     void *priv;
     device_t *dev;
 } vfs_fs_t;
@@ -39,7 +39,7 @@ typedef struct __vfs_mountpoint {
 
 vfs_mountpoint_t *vfs_find_mountpoint(char *);
 
-void vfs_read(vfs_fdstruct *, uint8_t *, size_t);
+ssize_t vfs_read(vfs_fdstruct *, uint8_t *, size_t);
 
 ssize_t vfs_write(vfs_fdstruct *, uint8_t *, size_t);
 

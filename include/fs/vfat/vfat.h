@@ -97,7 +97,7 @@ VFAT_directory_entry *VFAT_read_dir(vfs_fs_t *, VFAT_directory_entry *);
 
 uint8_t VFAT_fat_hasnext(vfs_fs_t *fs, uint32_t entry);
 
-void VFAT_read(vfs_fs_t *, vfs_fdstruct *, uint8_t *, size_t);
+ssize_t VFAT_read(vfs_fs_t *, vfs_fdstruct *, uint8_t *, size_t);
 
 ssize_t VFAT_write(vfs_fs_t *, vfs_fdstruct *, uint8_t *, size_t);
 
