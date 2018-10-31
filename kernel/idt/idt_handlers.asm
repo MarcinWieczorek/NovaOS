@@ -148,6 +148,7 @@ handle_isr_1E:
     JMP handle_isr_common
 handle_isr_20:
     CLI
+    SUB ESP, 4
     PUSH BYTE 0
     PUSH BYTE 0x20
     JMP handle_isr_common

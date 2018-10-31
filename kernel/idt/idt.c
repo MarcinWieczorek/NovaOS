@@ -1,15 +1,16 @@
 #define __NEED_off_t
 
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <bits/alltypes.h>
 #include <bits/syscall.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/io.h>
 
 #include <kernel/idt/idt.h>
-#include <kernel/pic.h>
 #include <kernel/syscall/syscall.h>
+
+#include <drivers/pic/pic.h>
 
 unsigned char* exception_messages[] = {
         "Division by 0",
@@ -104,7 +105,7 @@ long handle_isr(struct isr_regs *r) {
         printf("\nIRQ #%i", r->int_no);
     }
 
-    PIC_sendEOI(r->int_no);
+    PIC_send_EOI(r->int_no);
     return ret;
 }
 

@@ -29,7 +29,7 @@ General
   - [ ] Good memory allocation
   - [ ] Memory map detection
   - [ ] General purpose algorithms like stack, heap
-  - [ ] ELF interpretter
+  - [ ] ELF interpreter
   - [ ] Paging
   - [ ] Processes
 

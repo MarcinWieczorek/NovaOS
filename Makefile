@@ -1,14 +1,17 @@
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+ARCH = i386
 C_SOURCES = $(call rwildcard,*,*.c)
 ASM_SOURCES = $(call rwildcard,libc/*,*.asm)
 ASM_KERNEL_SOURCES = $(call rwildcard,kernel/*,*.asm)
+ASM_ARCH_SOURCES = $(call rwildcard,arch/$(ARCH)*,*.asm)
 OBJ := $(C_SOURCES:.c=.o)
 ASM_OBJ := $(ASM_SOURCES:.asm=.o)
 ASM_OBJ += $(ASM_KERNEL_SOURCES:.asm=.o)
+ASM_OBJ += $(ASM_ARCH_SOURCES:.asm=.o)
 CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
 # ARCH = $(shell uname -m)
-ARCH = i386
 QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
 CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Iinclude  -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto -ggdb
 all: os-image
