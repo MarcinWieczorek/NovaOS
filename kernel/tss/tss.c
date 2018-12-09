@@ -30,7 +30,8 @@ void tss_write(gdt_entry_bits *g) {
     tss_entry.ss0  = 0x10;    // Set the kernel stack segment.
 }
 
-void tss_install() {
+int tss_install() {
     tss_write(TSS_ADDRESS);
     tss_flush();
+    return 1;
 }

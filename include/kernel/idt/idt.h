@@ -27,7 +27,7 @@ struct idt_entry idt[256];
 struct idt_ptr idtp;
 
 unsigned char keyboard_map[128];
-unsigned char* exception_messages[32];
+char* exception_messages[32];
 
 extern void idt_load(void);
 extern void handle_isr_0(void);

@@ -13,7 +13,10 @@ CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
 # ARCH = $(shell uname -m)
 QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
-CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc -I. -Ilibc/include -Iinclude  -Ilibc/arch/$(ARCH)/ -fno-asynchronous-unwind-tables -fdiagnostics-color=auto -ggdb
+CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc \
+		  -I. -Ilibc/include -Iinclude  -Ilibc/arch/$(ARCH)/ \
+		  -fno-asynchronous-unwind-tables -fdiagnostics-color=auto \
+		  -ggdb -Wall -Wno-pointer-sign
 all: os-image
 
 %.bin: %.asm

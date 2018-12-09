@@ -83,7 +83,6 @@ uint32_t VFAT_fat_entry(vfs_fs_t *fs, uint32_t cluster) {
 }
 
 uint32_t VFAT_size_clusters(vfs_fs_t *fs, uint32_t cluster) {
-    fs_vfat_t *vfat = fs->priv;
     uint32_t entry;
     uint32_t size = 0;
 
@@ -125,7 +124,6 @@ void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
 
 void VFAT_write_cluster(vfs_fs_t *fs, uint32_t cluster, off_t offset,
                         uint8_t *buf, size_t n) {
-    fs_vfat_t *vfat = fs->priv;
     fs->dev->write(fs->dev, buf,
                    VFAT_get_offset_cluster(fs, cluster) + offset, n);
 }
@@ -159,6 +157,7 @@ void VFAT_read_chain(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
 
 ssize_t VFAT_write_chain(vfs_fs_t *fs, uint32_t cluster, off_t offset,
                          uint8_t *buf, size_t n) {
+    size_t n_start = n;
     fs_vfat_t *vfat = fs->priv;
     uint32_t entry;
     uint32_t bpc = vfat->header->BPB_BytsPerSec * vfat->header->BPB_SecPerClus;
@@ -187,6 +186,8 @@ ssize_t VFAT_write_chain(vfs_fs_t *fs, uint32_t cluster, off_t offset,
         entry = VFAT_fat_entry(fs, cluster);
         cluster = entry;
     } while(VFAT_fat_hasnext(fs, entry));
+
+    return n_start - n;
 }
 
 VFAT_directory_entry *VFAT_read_dir_root(vfs_fs_t *fs) {

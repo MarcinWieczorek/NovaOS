@@ -59,7 +59,7 @@ typedef struct {
 
 void tss_write(gdt_entry_bits *);
 
-void tss_install();
+int tss_install();
 
 extern void tss_flush();
 

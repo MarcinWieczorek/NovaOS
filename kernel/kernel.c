@@ -6,6 +6,7 @@
 #include <kernel/tss/tss.h>
 
 #include <fs/vfs/vfs.h>
+#include <fs/devfs/devfs.h>
 
 #include <drivers/screen.h>
 #include <drivers/pic/pic.h>
@@ -16,6 +17,18 @@
         puts("["); \
         set_foreground_color(VGA_TEXTMODE_COLOR_GREEN); \
         puts("OK"); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        puts("] "); \
+        printf(fmt, ##__VA_ARGS__); \
+        puts("\n"); \
+    } while(0)
+
+#define MSG_ERR(fmt, ...) \
+    do { \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        puts("["); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_RED); \
+        puts("ERR"); \
         set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
         puts("] "); \
         printf(fmt, ##__VA_ARGS__); \
@@ -40,6 +53,14 @@ int main(void) {
     // Install VFS
     vfs_init();
     MSG_OK("VFS initialized");
+
+    // Init DEVFS
+    if(devfs_init()) {
+        MSG_OK("DEVFS initialized");
+    }
+    else {
+        MSG_ERR("DEVFS initialization failed");
+    }
     return 0;
 }
 

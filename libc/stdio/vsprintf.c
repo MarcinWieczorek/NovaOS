@@ -11,8 +11,8 @@ static const char digits_hex_lower[16] = "0123456789abcdef";
 int vsprintf_int(char **, int, int, const char *, char);
 
 int vsprintf(char *str, const char *format, __isoc_va_list args) {
+    char *str_start = str;
     int stop = (int) format + strlen(format);
-    char length = 64;
 
     while((int) format < stop) {
         char c = *(format);
@@ -77,10 +77,10 @@ int vsprintf(char *str, const char *format, __isoc_va_list args) {
 
         format++;
         *(str++) = c;
-        length = 64;
     }
 
     va_end(args);
+    return strlen(str_start);
 }
 
 int vsprintf_int(char **str, int i, int base, const char *digits, char sig) {

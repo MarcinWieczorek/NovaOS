@@ -12,7 +12,7 @@
 
 #include <drivers/pic/pic.h>
 
-unsigned char* exception_messages[] = {
+char* exception_messages[] = {
         "Division by 0",
         "Debug",
         "Non Maskable Interrupt",
