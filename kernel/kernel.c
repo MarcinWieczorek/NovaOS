@@ -14,25 +14,25 @@
 #define MSG_OK(fmt, ...) \
     do { \
         set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
-        puts("["); \
+        printf("["); \
         set_foreground_color(VGA_TEXTMODE_COLOR_GREEN); \
-        puts("OK"); \
+        printf("OK"); \
         set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
-        puts("] "); \
+        printf("] "); \
         printf(fmt, ##__VA_ARGS__); \
-        puts("\n"); \
+        puts(""); \
     } while(0)
 
 #define MSG_ERR(fmt, ...) \
     do { \
         set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
-        puts("["); \
+        printf("["); \
         set_foreground_color(VGA_TEXTMODE_COLOR_RED); \
-        puts("ERR"); \
+        printf("ERR"); \
         set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
-        puts("] "); \
+        printf("] "); \
         printf(fmt, ##__VA_ARGS__); \
-        puts("\n"); \
+        puts(""); \
     } while(0)
 
 int main(void) {

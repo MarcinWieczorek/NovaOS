@@ -3,5 +3,7 @@
 #include <string.h>
 
 int puts(const char *str) {
-    return write(STDOUT_FILENO, str, strlen(str));
+    int r = write(STDOUT_FILENO, str, strlen(str));
+    r += putchar('\n');
+    return r;
 }
