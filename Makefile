@@ -80,7 +80,8 @@ tags:
 	ctags -R
 
 run: os-image
-	$(QEMU) -drive format=raw,file=$^
+	$(QEMU) -drive format=raw,file=$^ \
+		-m 256M
 
 libc/include/bits/syscall.h: libc/arch/$(ARCH)/bits/syscall.h.in
 	@cp $< $@

@@ -1,5 +1,6 @@
 [GLOBAL thread_switch]
 [GLOBAL thread_write]
+[EXTERN thread_exit]
 
 TSS_ADDRESS EQU 0xC2C
 
@@ -48,6 +49,7 @@ thread_write:
 
     MOV DWORD EBX, [EDI + TCB.ESP]
     MOV DWORD EAX, [ESP + 0x8]
+    MOV DWORD [EBX + 0x14], thread_exit
     MOV DWORD [EBX + 0x10], EAX
     MOV DWORD [EBX + 0x0C], 0
     MOV DWORD [EBX + 0x08], 0
@@ -57,3 +59,4 @@ thread_write:
     MOV  ESP, EBP
     POP  EBP
     RET
+

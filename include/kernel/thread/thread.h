@@ -11,9 +11,11 @@ typedef struct {
     char *name;
 } thread_t;
 
-thread_t *thread_pool;
+thread_t **thread_pool;
 uint32_t current_thread_index = 0;
 uint32_t thread_count = 0;
+uint32_t stack_space;
+uint32_t stack_diff;
 
 void thread_init();
 
@@ -21,7 +23,13 @@ void thread_switch(thread_t *, thread_t *);
 
 thread_t *thread_create(void *fun);
 
+void thread_remove(thread_t *);
+
 void thread_write(void *fun, thread_t *);
+
+thread_t *thread_get();
+
+void thread_loop();
 
 #endif
 

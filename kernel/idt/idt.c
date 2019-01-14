@@ -9,6 +9,7 @@
 
 #include <kernel/idt/idt.h>
 #include <kernel/syscall/syscall.h>
+#include <kernel/thread/thread.h>
 
 #include <drivers/pic/pic.h>
 
@@ -102,7 +103,12 @@ long handle_isr(struct isr_regs *r) {
         }
     }
     else {
-        printf("\nIRQ #%i", r->int_no);
+        if(r->int_no == 0x20) { //Timer IRQ
+            thread_loop();
+        }
+        else {
+            printf("\nIRQ #%i", r->int_no);
+        }
     }
 
     PIC_send_EOI(r->int_no);
