@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define TSS_ADDRESS (void *) 0xC2C
-
 struct tss_entry_struct {
    uint32_t prev_tss;   // The previous TSS - if we used hardware task switching this would form a linked list.
    uint32_t esp0;       // The stack pointer to load when we change to kernel mode.

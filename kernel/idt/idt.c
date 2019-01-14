@@ -95,6 +95,9 @@ long handle_isr(struct isr_regs *r) {
             case SYS_time:
                 ret = do_time((time_t *) *(int *) vars);
                 break;
+            case SYS_brk:
+                ret = do_brk((void *) *(int *) vars);
+                break;
             case SYS_lseek:
                 ret = do_lseek(*(unsigned int *) vars,
                     *(off_t *) (vars + sizeof(int)),

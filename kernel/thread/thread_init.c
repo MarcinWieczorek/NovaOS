@@ -1,14 +1,14 @@
 #include <stdlib.h>
 
 #include <kernel/thread/thread.h>
+#include <kernel/mm/layout.h>
 
 void thread_init() {
     thread_pool = calloc(THREAD_COUNT_MAX, sizeof(thread_t *));
     current_thread_index = 0;
-    stack_space = 0x100000;
-    stack_diff = 0x500; //Stack size for each thread
+    stack_space = THREAD_STACK_START;
 
-    stack_space += stack_diff;
+    stack_space += THREAD_STACK_SIZE;
     thread_t *t = malloc(sizeof(thread_t));
     t->esp0 = stack_space;
     t->name = "Kernel Thread #0";
@@ -26,7 +26,7 @@ thread_t *thread_create(void *fun) {
         }
     }
 
-    stack_space += stack_diff;
+    stack_space += THREAD_STACK_SIZE;
     thread_pool[i] = t;
     t->esp0 = stack_space;
     t->esp  = stack_space;

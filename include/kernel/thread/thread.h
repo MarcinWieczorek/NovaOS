@@ -15,7 +15,6 @@ thread_t **thread_pool;
 uint32_t current_thread_index = 0;
 uint32_t thread_count = 0;
 uint32_t stack_space;
-uint32_t stack_diff;
 
 void thread_init();
 

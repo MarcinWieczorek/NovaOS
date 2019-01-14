@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <kernel/tss/tss.h>
+#include <kernel/mm/layout.h>
 
 tss_entry_t tss_entry;
 
@@ -26,12 +27,12 @@ void tss_write(gdt_entry_bits *g) {
 
     memset(&tss_entry, 0, sizeof(tss_entry));
 
-    tss_entry.esp0 = 0xA0000; // Set the kernel stack pointer.
+    tss_entry.esp0 = THREAD_STACK_START; // Set the kernel stack pointer.
     tss_entry.ss0  = 0x10;    // Set the kernel stack segment.
 }
 
 int tss_install() {
-    tss_write(TSS_ADDRESS);
+    tss_write(GDT_ADDR_TSS);
     tss_flush();
     return 1;
 }

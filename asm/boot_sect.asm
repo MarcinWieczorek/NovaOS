@@ -19,7 +19,7 @@ CALL switch_to_pm           ; Switch to Protected Mode
 load_kernel:
     MOV BX, 0
     MOV CL, 2               ; Start reading from 2nd sector (after boot)
-    MOV DH, 52
+    MOV DH, 57
     MOV CH, 0x00            ; Select cylinder 0
     PUSH 0x1000
     POP ES

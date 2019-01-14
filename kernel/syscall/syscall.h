@@ -17,4 +17,6 @@ off_t do_lseek(int, off_t, int);
 
 time_t do_time(time_t *tloc);
 
+int do_brk(void *);
+
 #endif
