@@ -16,7 +16,8 @@ QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
 CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc \
 		  -I. -Ilibc/include -Iinclude  -Ilibc/arch/$(ARCH)/ \
 		  -fno-asynchronous-unwind-tables -fdiagnostics-color=auto \
-		  -ggdb -Wall -Wno-pointer-sign
+		  -ggdb -Wall -Wno-pointer-sign \
+		  -D_POSIX_SOURCE
 all: os-image
 
 %.bin: %.asm
