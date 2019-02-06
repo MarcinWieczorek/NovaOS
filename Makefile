@@ -11,6 +11,7 @@ ASM_OBJ += $(ASM_KERNEL_SOURCES:.asm=.o)
 ASM_OBJ += $(ASM_ARCH_SOURCES:.asm=.o)
 CROSS = $(HOME)/opt/cross/
 CC = $(CROSS)bin/i686-elf-gcc
+AS = yasm
 # ARCH = $(shell uname -m)
 QEMU = $(shell find /usr/bin -name "qemu-system-$(ARCH)")
 CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc \
@@ -21,11 +22,11 @@ CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc \
 all: os-image
 
 %.bin: %.asm
-	@nasm -i asm/ $^ -f bin -o $@
+	@$(AS) -i asm/ $^ -f bin -o $@
 	@echo "AS $<"
 
 %.o: %.asm
-	@nasm $^ -f elf -F dwarf -g -o $@
+	@$(AS) $^ -f elf -g DWARF2 -o $@
 	@echo "AS $<"
 
 asm/kernel.bin: asm/kernel_entry.o $(OBJ) $(ASM_OBJ)
@@ -49,7 +50,6 @@ asm/kernel.bin: asm/kernel_entry.o $(OBJ) $(ASM_OBJ)
 
 %.o: %.c $(C_SOURCES) libc/include/bits/alltypes.h libc/include/bits/syscall.h
 	@$(CC) $(CCFLAGS) -c $< -o $@
-	@echo "CC $<"
 
 os-image: asm/boot_sect.bin asm/kernel.bin
 	@cat $^ > os-image
@@ -62,6 +62,7 @@ debug:
 
 debug-qemu: os-image
 	$(QEMU) -drive format=raw,file=$^ \
+		-m 256M \
 		-monitor stdio -m 1 -s -S \
 		-d guest_errors,cpu_reset,int
 

@@ -1,6 +1,6 @@
-global syscall
+[GLOBAL syscall]
 
-syscall:
+$syscall:
     PUSH EBP
     MOV EBP, ESP
 
