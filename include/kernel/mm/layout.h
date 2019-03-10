@@ -7,7 +7,8 @@
 #define GDT_ADDR_TSS ((void *) 0x0C2C)
 #define GDT_DESCRIPTOR  0x0C2C
 
-#define PAGING_DIRECTORY 0x1000
+#define PAGING_DIRECTORY   0x1000
+#define PAGING_FIRST_TABLE 0x2000
 
 #define BOOT_START 0x7C00
 

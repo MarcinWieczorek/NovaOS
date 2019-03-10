@@ -4,6 +4,18 @@
 #define __NEED_size_t
 #include <stdint.h>
 
+#define PAGING_MASK_PT_C 0x10
+#define PAGING_MASK_PT_W 0x08
+#define PAGING_MASK_PT_U 0x04
+#define PAGING_MASK_PT_R 0x02
+#define PAGING_MASK_PT_P 0x01
+
+#define PAGING_UINT32_TYPES 1
+
+#ifdef PAGING_UINT32_TYPES
+typedef uint32_t paging_pd;
+typedef uint32_t paging_pt;
+#else
 typedef struct {
     uint32_t address : 20;
     uint32_t available : 3;
@@ -31,6 +43,9 @@ typedef struct {
     uint32_t R : 1;
     uint32_t P : 1;
 } paging_pt;
+#endif
+
+void paging_init();
 
 void paging_enable(paging_pd *);
 

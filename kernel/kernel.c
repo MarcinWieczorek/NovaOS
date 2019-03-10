@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #include <kernel/idt/idt.h>
+#include <kernel/mm/layout.h>
+#include <kernel/paging/paging.h>
 #include <kernel/thread/thread.h>
 #include <kernel/tss/tss.h>
 
@@ -47,8 +49,13 @@ int main(void) {
     tss_install();
     MSG_OK("TSS initialized");
 
-    //Enable IRQ0
+    //Enable Paging
+    paging_init();
+    MSG_OK("Paging enabled");
+
+    //Enable IRQs
     PIC_clear_mask(0x0);
+    PIC_clear_mask(0x6);
 
     // Install VFS
     vfs_init();
