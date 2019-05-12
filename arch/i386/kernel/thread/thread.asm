@@ -5,6 +5,8 @@
 TSS_ADDRESS EQU 0xC2C
 
 STRUC TCB
+    .PID:  RESD 1
+    .PPID: RESD 1
     .ESP0: RESD 1
     .ESP:  RESD 1
     .CR3:  RESD 1

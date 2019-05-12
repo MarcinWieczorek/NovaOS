@@ -119,7 +119,7 @@ uint32_t VFAT_get_offset_cluster(vfs_fs_t *fs, uint32_t cluster) {
 void VFAT_read_cluster(vfs_fs_t *fs, uint32_t cluster, uint8_t *buf) {
     fs_vfat_t *vfat = fs->priv;
     fs->dev->read(fs->dev, buf, VFAT_get_offset_cluster(fs, cluster),
-                  vfat->header->BPB_BytsPerSec);
+                  vfat->header->BPB_BytsPerSec * vfat->header->BPB_SecPerClus);
 }
 
 void VFAT_write_cluster(vfs_fs_t *fs, uint32_t cluster, off_t offset,

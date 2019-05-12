@@ -9,6 +9,7 @@
 
 #include <fs/vfs/vfs.h>
 #include <fs/devfs/devfs.h>
+#include <kernel/syscall/syscall.h>
 
 #include <drivers/screen.h>
 #include <drivers/pic/pic.h>
@@ -68,6 +69,9 @@ int main(void) {
     else {
         MSG_ERR("DEVFS initialization failed");
     }
+
+    // Run init
+    do_execve("/INIT", NULL, NULL);
     return 0;
 }
 

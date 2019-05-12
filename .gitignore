@@ -11,4 +11,5 @@ libc/include/bits/alltypes.h
 *.sym
 *.elf
 *.diff
+*.so
 

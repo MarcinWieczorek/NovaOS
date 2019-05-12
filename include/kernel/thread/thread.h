@@ -5,6 +5,8 @@
 #define THREAD_COUNT_MAX 16
 
 typedef struct {
+    uint32_t pid;
+    uint32_t ppid;
     uint32_t esp0;
     uint32_t esp;
     uint32_t cr3;
