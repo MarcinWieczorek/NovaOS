@@ -10,6 +10,7 @@
 #include <kernel/idt/idt.h>
 #include <kernel/syscall/syscall.h>
 #include <kernel/thread/thread.h>
+#include <kernel/tty.h>
 
 #include <drivers/pic/pic.h>
 
@@ -47,6 +48,8 @@ char* exception_messages[] = {
         "Security"
         "", //Reserved 31
 };
+
+uint8_t lctrl, lalt;
 
 long handle_isr(struct isr_regs *r) {
     long ret = 0;
@@ -108,6 +111,42 @@ long handle_isr(struct isr_regs *r) {
     else {
         if(r->int_no == 0x20) { //Timer IRQ
             thread_loop();
+        }
+        else if(r->int_no == 0x21) {
+            unsigned char scancode;
+            scancode = inb(0x60);
+
+            switch(scancode) {
+                case 0x1D: // Left CTRL
+                case 0x9D:
+                    lctrl = !(scancode & 0x80);
+                    break;
+                case 0x38: // Left ALT
+                case 0xB8:
+                    lalt = !(scancode & 0x80);
+                    break;
+                case 0x4B: // Left arrow
+                    if(lctrl && lalt) {
+                        struct tty *tty = tty_get_current();
+                        struct tty *prev = tty_get_prev(tty);
+
+                        if(prev != NULL && prev != tty) {
+                            tty_switch(prev);
+                        }
+                    }
+                    break;
+                case 0x4D: // Right arrow
+                    if(lctrl && lalt) {
+                        struct tty *tty = tty_get_current();
+                        struct tty *next = tty_get_next(tty);
+
+                        if(next != NULL && next != tty) {
+                            tty_switch(next);
+                        }
+                    }
+                    break;
+                default:
+            }
         }
         else {
             printf("\nIRQ #%i", r->int_no);

@@ -2,14 +2,19 @@
 #define _THREAD_THREAD_H
 #include <stdint.h>
 
+struct thread;
+
+#include <proc/process.h>
+
 #define THREAD_COUNT_MAX 16
 
-typedef struct {
+typedef struct thread {
     uint32_t pid;
     uint32_t ppid;
     uint32_t esp0;
     uint32_t esp;
     uint32_t cr3;
+    struct proc *proc;
     char *name;
 } thread_t;
 
@@ -22,7 +27,7 @@ void thread_init();
 
 void thread_switch(thread_t *, thread_t *);
 
-thread_t *thread_create(void *fun);
+thread_t *thread_create(struct proc *, void *fun);
 
 void thread_remove(thread_t *);
 

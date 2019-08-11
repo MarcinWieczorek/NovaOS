@@ -21,7 +21,7 @@ struct elf32 *elf32_load(void *data) {
 }
 
 int elf32_execute(struct elf32 *elf) {
-    thread_create((void *) elf->header->e_entry);
+    thread_create(thread_get()->proc, (void *) elf->header->e_entry);
     return 0;
 }
 

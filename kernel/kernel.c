@@ -6,6 +6,7 @@
 #include <kernel/paging/paging.h>
 #include <kernel/thread/thread.h>
 #include <kernel/tss/tss.h>
+#include <kernel/tty.h>
 
 #include <fs/vfs/vfs.h>
 #include <fs/devfs/devfs.h>
@@ -57,6 +58,10 @@ int main(void) {
     //Enable IRQs
     PIC_clear_mask(0x0);
     PIC_clear_mask(0x6);
+
+    //Create TTY
+    struct tty *tty0 = tty_create();
+    tty_switch(tty0);
 
     // Install VFS
     vfs_init();

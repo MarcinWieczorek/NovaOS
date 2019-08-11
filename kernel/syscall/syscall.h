@@ -19,7 +19,7 @@ off_t do_lseek(int, off_t, int);
 
 #include <time.h>
 
-time_t do_time(time_t *tloc);
+time_t do_time(time_t *);
 
 int do_brk(void *);
 

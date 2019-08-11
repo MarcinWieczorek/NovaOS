@@ -10,6 +10,7 @@ STRUC TCB
     .ESP0: RESD 1
     .ESP:  RESD 1
     .CR3:  RESD 1
+    .PROC  RESD 1
     .NAME  RESD 1
 ENDSTRUC
 

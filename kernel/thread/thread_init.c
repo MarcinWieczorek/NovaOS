@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <kernel/thread/thread.h>
 #include <kernel/mm/layout.h>
@@ -11,7 +12,7 @@ void thread_init() {
     stack_space = THREAD_STACK_START;
 }
 
-thread_t *thread_create(void *fun) {
+thread_t *thread_create(struct proc *proc, void *fun) {
     thread_t *t = malloc(sizeof(thread_t));
 
     int i = 0;
@@ -29,6 +30,8 @@ thread_t *thread_create(void *fun) {
     thread_count++;
     t->pid = thread_count;
     t->ppid = current_thread_index;
+    t->proc = proc;
+    proc->thread = t;
     sprintf(t->name, "Thread %d", t->pid);
     thread_write(fun, t);
     return t;
