@@ -61,6 +61,10 @@ void thread_remove(thread_t *t) {
 }
 
 thread_t *thread_get() {
+    if(current_thread_index == -1) {
+        return NULL;
+    }
+
     return thread_pool[current_thread_index];
 }
 

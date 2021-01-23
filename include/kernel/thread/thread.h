@@ -1,5 +1,4 @@
-#ifndef _THREAD_THREAD_H
-#define _THREAD_THREAD_H
+#pragma once
 #include <stdint.h>
 
 struct thread;
@@ -36,6 +35,4 @@ void thread_write(void *fun, thread_t *);
 thread_t *thread_get();
 
 void thread_loop();
-
-#endif
 

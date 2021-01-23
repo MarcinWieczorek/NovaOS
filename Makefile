@@ -19,6 +19,7 @@ CCFLAGS = -std=c99 -m32 -ffreestanding -nostdlib -static-libgcc -lgcc \
 		  -fno-asynchronous-unwind-tables -fdiagnostics-color=auto \
 		  -ggdb -Wall -Wno-pointer-sign \
 		  -D_POSIX_SOURCE
+
 all: os-image
 
 %.bin: %.asm
@@ -62,6 +63,7 @@ debug:
 
 debug-qemu: os-image
 	$(QEMU) -drive format=raw,file=$^ \
+		-drive format=raw,file=fat8.img \
 		-m 256M \
 		-monitor stdio -m 1 -s -S \
 		-d guest_errors,cpu_reset,int
@@ -83,6 +85,7 @@ tags:
 
 run: os-image
 	$(QEMU) -drive format=raw,file=$^ \
+		-drive format=raw,file=fat8.img \
 		-m 256M
 
 libc/include/bits/syscall.h: libc/arch/$(ARCH)/bits/syscall.h.in

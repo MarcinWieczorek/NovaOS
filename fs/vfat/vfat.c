@@ -4,6 +4,33 @@
 #include <string.h>
 
 #include <fs/vfat/vfat.h>
+#include <drivers/screen.h>
+
+#define VFAT_DEBUG 1
+
+#if VFAT_DEBUG
+#define VD(fmt, ...) \
+    do { \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        printf("["); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_MAGENTA); \
+        printf("VFAT"); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        printf("] "); \
+        printf(fmt, ##__VA_ARGS__); \
+        puts(""); \
+    } while(0)
+#else
+#define VD(fmt, ...) \
+    do { \
+        printf(""); \
+        printf(""); \
+        set_foreground_color(VGA_TEXTMODE_COLOR_WHITE); \
+        printf(""); \
+        printf(""); \
+        printf(""); \
+    } while(0)
+#endif
 
 vfs_fs_t *VFAT_init(device_t *dev) {
     /* dev->read(dev, buf, 0, 3); */
@@ -17,6 +44,11 @@ vfs_fs_t *VFAT_init(device_t *dev) {
     VFAT_header *h = malloc(sizeof(VFAT_header));
     vfatfs->header = h;
     dev->read(dev, (uint8_t *) h, 0, sizeof(VFAT_header));
+
+    if(h->BPB_BytsPerSec == 0) {
+        VD("PANIC: BPB_BytsPerSec should not be 0");
+        return NULL;
+    }
 
     uint32_t root_dir_sectors =
         (h->BPB_RootEntCnt * 32 + h->BPB_BytsPerSec - 1) / h->BPB_BytsPerSec;
@@ -45,12 +77,15 @@ vfs_fs_t *VFAT_init(device_t *dev) {
 
     if(count_of_clusters < 4085) {
         vfatfs->type = 12;
+        VD("FAT12");
     }
     else if(count_of_clusters < 65525) {
         vfatfs->type = 16;
+        VD("FAT16");
     }
     else {
         vfatfs->type = 32;
+        VD("FAT32");
     }
 
     int first_root_dir_entry = h->BPB_RsvdSecCnt * h->BPB_BytsPerSec
@@ -230,7 +265,7 @@ uint8_t *VFAT_get_name_fat(uint8_t *str) {
     name[11] = '\0';
     if(dotpos != NULL) {
         strncpy(name, str, dotpos - str);
-        strncpy(name + 8, dotpos + 1, 3);
+        strncpy(name + 8, dotpos + 1, strlen(dotpos) - 1);
     }
     else {
         strncpy(name, str, strlen(str));
@@ -253,6 +288,7 @@ VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
 
     for(int di = 0; di < 512 / sizeof(VFAT_directory_entry); di++) {
         VFAT_directory_entry *d = search_dir + di;
+
         if(d->attr == 0) {
             break;
         }
@@ -268,6 +304,12 @@ VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
             }
         }
         else {
+#if 0 //Debug names
+            for(int i = 0; i < 11; i++) printf("%c ", d->name[i]);
+            puts("");
+            for(int i = 0; i < 11; i++) printf("%c ", fatrname[i]);
+            puts("");
+#endif
 
             if(strncmp(fatrname, d->name, 11) == 0) {
                 free(fatdname);
@@ -280,6 +322,7 @@ VFAT_directory_entry *VFAT_find_in_dir_re(vfs_fs_t *fs,
 
     free(fatrname);
     free(fatdname);
+
     if(next_dir != NULL) {
         VFAT_directory_entry *next_dir_content = VFAT_read_dir(fs, next_dir);
         return VFAT_find_in_dir_re(fs, next_dir_content, rname);
@@ -297,12 +340,25 @@ uint32_t VFAT_file_size(vfs_fs_t *fs, uint8_t *filename) {
 }
 
 ssize_t VFAT_read(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
+    VD("Reading: %s (%d bytes)", fds->path, n);
     uint8_t *filename = fds->path + strlen(fds->mp->location);
+
+    if(filename[0] != '/') {
+        filename--;
+    }
+
     VFAT_directory_entry *root_dir = VFAT_read_dir_root(fs);
+
+    if(root_dir == NULL) {
+        VD("Failed to find root directory!");
+        return 0;
+    }
+
     VFAT_directory_entry *dir = VFAT_find_in_dir_re(fs, root_dir, filename);
     free(root_dir);
 
     if(dir == NULL) {
+        VD("No such file or directory");
         return 0;
     }
 
@@ -329,4 +385,3 @@ ssize_t VFAT_write(vfs_fs_t *fs, vfs_fdstruct *fds, uint8_t *buf, size_t n) {
     free(dir);
     return VFAT_write_chain(fs, clus, fds->seek, buf, n);
 }
-

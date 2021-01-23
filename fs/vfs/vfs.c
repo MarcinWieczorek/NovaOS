@@ -101,7 +101,8 @@ ssize_t vfs_write(vfs_fdstruct *fds, uint8_t *buf, size_t n) {
 }
 
 off_t vfs_seek(int fd, off_t offset, int whence) {
-    vfs_fdstruct *fds = vfs_get_fdstruct(fd);
+    struct proc *proc = proc_get();
+    vfs_fdstruct *fds = vfs_get_fdstruct(proc, fd);
     off_t newseek;
 
     if(whence == SEEK_CUR) {
@@ -116,16 +117,17 @@ off_t vfs_seek(int fd, off_t offset, int whence) {
     return fds->seek;
 }
 
-vfs_fdstruct *vfs_get_fdstruct(int fd) {
-    return fdlist + fd;
+vfs_fdstruct *vfs_get_fdstruct(struct proc *p, int fd) {
+    return &p->fd_list[fd];
 }
 
 int vfs_open(char *path, int mode) {
     vfs_fdstruct *fds;
     int fd = -1;
+    struct proc *proc = proc_get();
 
     for(int fdl = 0; fdl < VFS_FD_MAX; fdl++) {
-        if(vfs_fd_empty(fdl)) {
+        if(vfs_fd_empty(proc, fdl)) {
             fd = fdl;
             break;
         }
@@ -137,7 +139,7 @@ int vfs_open(char *path, int mode) {
         return -1;
     }
 
-    fds = fdlist + fd;
+    fds = proc->fd_list + fd;
     fds->fd = fd;
     fds->path = path;
     fds->mode = mode;

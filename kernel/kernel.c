@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <kernel/idt/idt.h>
+#include <kernel/memory_manager.h>
 #include <kernel/mm/layout.h>
 #include <kernel/paging/paging.h>
 #include <kernel/thread/thread.h>
@@ -10,10 +13,12 @@
 
 #include <fs/vfs/vfs.h>
 #include <fs/devfs/devfs.h>
+#include <fs/vfat/vfat.h>
 #include <kernel/syscall/syscall.h>
 
 #include <drivers/screen.h>
 #include <drivers/pic/pic.h>
+#include <dev/ramdev/ramdev.h>
 
 #define MSG_OK(fmt, ...) \
     do { \
@@ -75,8 +80,46 @@ int main(void) {
         MSG_ERR("DEVFS initialization failed");
     }
 
-    // Run init
-    do_execve("/INIT", NULL, NULL);
+    // Create ram device
+    device_t *ramdev = ramdev_init((void *) 0x20000);
+    MSG_OK("RAMDEV initialized");
+
+    //Create VFAT
+    vfs_fs_t *vfat = VFAT_init(ramdev);
+
+    if(vfat == NULL) {
+        MSG_ERR("VFAT initalization failed");
+        return 1;
+    }
+
+    MSG_OK("VFAT initialized");
+    vfs_mount("/", ramdev, vfat);
+
+    // Create TTY
+    struct tty *tty0 = tty_create();
+    device_t *tty_dev = tty_dev_init(tty0);
+    devfs_node_add("/dev/tty", tty_dev);
+    tty_switch(tty0);
+    PIC_clear_mask(0x0);
+    tty_draw(tty0);
+
+    // Create process
+    struct proc *p_init = proc_create();
+    proc_set_tty(p_init, tty0);
+
+    // static base because no paging
+    uint8_t *proc_base = (void *) 0x08048000;
+    uint8_t *buf = proc_base;
+    int fd = open("/HWB.O", O_RDONLY);
+
+    if(fd == -1) {
+        puts("PANIC: Failed to open init file");
+        return 0;
+    }
+
+    read(fd, buf, 512);
+    thread_create(p_init, (void *) 0x80480B2);
+    tty_draw(tty0);
     return 0;
 }
 

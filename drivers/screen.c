@@ -114,10 +114,9 @@ void shift_cursor(int row, int col) {
 }
 
 void clear_screen() {
-    for(int r = 0; r < MAX_ROWS; r = r+1) {
-        for(int c = 0; c < MAX_COLS; c = c+1) {
-            print_char_at(' ', r, c);
-        }
+    for(int i = 0; i < MAX_ROWS * MAX_COLS; i += 2) {
+        unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
+        vidmem[i] = ' ';
     }
 
     set_cursor(0, 0);

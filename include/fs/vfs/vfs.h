@@ -1,5 +1,4 @@
-#ifndef _FS_VFS_VFS_H
-#define _FS_VFS_VFS_H
+#pragma once
 
 #define __NEED_size_t
 #define __NEED_ssize_t
@@ -11,11 +10,11 @@
 #define VFS_MOUNTPOINTS_MAX 16
 #define VFS_FD_MAX 16
 
-#define vfs_fd_empty(__fd) (fdlist[__fd].fd == -1)
+#define vfs_fd_empty(__proc, __fd) ((__proc == NULL ? kernel_fdlist : (__proc->fd_list))[__fd].fd == -1)
 
 struct __vfs_mountpoint;
 
-typedef struct {
+typedef struct __vfs_fdstruct {
     int fd;
     off_t seek;
     char *path;
@@ -37,6 +36,9 @@ typedef struct __vfs_mountpoint {
     vfs_fs_t *fs;
 } vfs_mountpoint_t;
 
+struct proc;
+#include <proc/process.h>
+
 vfs_mountpoint_t *vfs_find_mountpoint(char *);
 
 ssize_t vfs_read(vfs_fdstruct *, uint8_t *, size_t);
@@ -49,9 +51,9 @@ void vfs_init();
 
 void vfs_free();
 
-int vfs_open(char *, int);
+int vfs_open(struct proc *, char *, int);
 
-vfs_fdstruct *vfs_get_fdstruct(int);
+vfs_fdstruct *vfs_get_fdstruct(struct proc *, int);
 
 vfs_mountpoint_t *vfs_mount(char *location, device_t *, vfs_fs_t *);
 
@@ -59,4 +61,3 @@ vfs_mountpoint_t **vfs_mountlist();
 
 void vfs_umount(vfs_mountpoint_t *);
 
-#endif
